@@ -1,0 +1,328 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{subcaption}
+\usepackage{float}
+
+\title{Mixing Optimization : Optimal Permutation Matrix}
+
+
+\author{Octave Litrico}
+\date{\today}
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+I have developed a numerical algorithm to model algal growth in a water basin. 
+The model is based on the introduction of a source term into the discretization of the advection--diffusion equation with an upwind discretization of the advection term. 
+This additional term modifies the Courant--Friedrichs--Lewy (CFL) condition and, consequently, the value of the time step $\Delta t$. To converge, the numerical scheme must verify : 
+\[ \Delta_t \leq \frac{\Delta_x^2}{2\mu + a\Delta_x}\]
+Let us first represent the time evolution of this upwind numerical scheme, without any source term, in order to highlight its convergence.
+
+\begin{figure}[H]
+    \centering
+
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{C:/Users/octav/OneDrive/modélisation algues/schéma décentré t=0.png}
+        \caption{$t = 0\,\mathrm{s}$}
+        \label{fig:t0}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{C:/Users/octav/OneDrive/modélisation algues/schéma décentré t=10.png}
+        \caption{$t = 10\,\mathrm{s}$}
+        \label{fig:t10}
+    \end{subfigure}
+\end{figure}
+\begin{figure}[H]
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{C:/Users/octav/OneDrive/modélisation algues/schéma décentré t=20.png}
+        \caption{$t = 20\,\mathrm{s}$}
+        \label{fig:t20}
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{C:/Users/octav/OneDrive/modélisation algues/schéma décentré t=30.png}
+        \caption{$t = 30\,\mathrm{s}$}
+        \label{fig:t30}
+    \end{subfigure}
+
+    \caption{Time evolution of the upwind numerical scheme.}
+    \label{fig:time_evolution}
+\end{figure}
+\section{introduction of a biomass source term}
+
+In this report, we present first numerical results illustrating the total biomass in the basin after a growth period of $T = 100\,\mathrm{s}$. 
+The algae follow the Han growth model, which is of Haldane if the dynamic of the open state A is at its steady state.
+The light intensity follows a Beer-lambert law. The $\epsilon$ light extinction coefficient will be computed once and for all based on an approximation of the affine model : 
+\[\epsilon(\rho) = \alpha_0\rho + \alpha_1\]
+Where $\rho$ is the biomass concentration, $\alpha_0 > 0 \ [m^2g^{-1}]$ stands for the specific light extinction coefficient of the microalgae species
+and $\alpha_1 \ [m^{-1}]$ defines the background turbidity due to all non-microalgae components. We choose the following values : \\
+$\alpha_0 = 0.214$ (Monodus subterraneu)
+$\alpha_1 = 0.2$ (water extinction coefficient). \\
+
+Therefore, we approximate $\epsilon$ to $\frac{1}{H}\int_{0}^{H}(\alpha_0\rho(z) + \alpha_1)dz$. Let us once again simplify this formula by using a uniform initial concentration :
+$\rho(z) = \rho = \frac{B_{tot}}{V} = 1$ with $B_{tot}$ the total initial biomass and $V$ the basin volume. 
+We have $\epsilon = 0.207$.
+And for the values of the constants involved in the computing of $\mu$ : \\
+\[
+\begin{aligned}
+I_s &= 1500 \ \mathrm{m^{-2}\,\mu mol\,s^{-1}},\\
+k_d &= 2.99 \times 10^{-5},\\
+k_r &= 4.8 \times 10^{-5} \ \mathrm{s^{-1}},\\
+k_h &= 3.64 \times 10^{-5},\\
+\tau &= 6.849 \ \mathrm{s},\\
+\sigma_H &= 2.9 \times 10^{-4} \ \mathrm{m^{2}\,\mu mol^{-1}}
+\end{aligned}
+\]
+
+We have 
+\[
+A = \frac{1}{\frac{k_d}{k_r}\,\tau\,(\sigma_H I)^2 + \tau\,\sigma_H I + 1}
+\]
+
+And 
+
+\[
+\mu = A\, I\, k_h\, \sigma_H = 1.78\cdot 10^{-4}
+\] 
+The simulations are performed for a single layer, and therefore without any mixing effects. 
+The only varying parameter is the water velocity $u$. For a discretization of 50 points, we impose an initial sinusoidal concentration and an initial total biomass of 42.3 Kg.
+After an hour of growth, we get the following total biomass table for different current speed values.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Current speed (m.s$^{-1}$)} & \textbf{Total biomass (kg)} \\
+\hline
+0   & 44.5209 \\
+0.1 & 44.5208 \\
+0.2 & 44.5207 \\
+0.3 & 44.5206 \\
+0.5 & 44.5205 \\
+1   & 44.5204 \\
+\hline
+\end{tabular}
+\caption{Total biomass as a function of current speed}
+\label{tab:biomass_speed}
+\end{table}
+
+It seems, that the biomass grows less as the current increases. One must take into account that $\Delta_t$, the time step of the numerical scheme depends on the value of the speed $u$. 
+This follows from the upwind scheme CFL condition. 
+
+
+\section{Optimization of the Mixing Matrix}
+
+\subsection{General Principle of the Algorithm}
+
+The objective of the algorithm is to optimize a mixing matrix applied to a discretized basin,
+in order to maximize the total biomass produced by the system.
+
+For a given initial configuration, a candidate mixing matrix is repeatedly applied to the system.
+The temporal evolution of the basin is simulated with a constant time step, for a given period $T$.
+The total biomass is then evaluated.
+
+The algorithm explores different admissible mixing matrices (among every existing permutation matrices) and retains the one
+that maximizes the final total biomass.
+
+\subsection{Tested Initial Configurations}
+
+In this study, the basin consists of three vertical layers.
+The initial conditions are constructed by placing all the initial biomass (50 Kg) in a single layer,
+while the other layers start with zero biomass. 
+Three configurations are therefore considered, corresponding to the successive activation of each layer. The idea is to choose the mixing matrix which induces a maximal biomass after an hour of growth.
+
+\subsection{Optimization Results}
+
+For each initial configuration, the optimization algorithm converges to a matrix
+that maximizes the final total biomass.
+
+\subsubsection{Configuration 1: biomass initially in layer 1}
+
+The maximal total biomass obtained is:
+\[
+B_{\text{tot}} = 52.76 \ \mathrm{Kg}
+\]
+
+The optimal mixing matrix is:
+\[
+\mathbf{M}_2 =
+\begin{pmatrix}
+0 & 0 & 1 \\
+0 & 1 & 0 \\
+1 & 0 & 0
+\end{pmatrix}
+\]
+
+This matrix induces a permutation of layers which favorises a complete vertical redistribution of biomass, and in particular, the allocation of layer 1 in position 3.
+
+\subsubsection{Configuration 2: biomass initially in layer 2}
+
+The maximal total biomass obtained is:
+\[
+B_{\text{tot}} = 52.83 \ \mathrm{Kg}
+\]
+
+The optimal mixing matrix is:
+\[
+\mathbf{M}_3 =
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 0 & 1 \\
+0 & 1 & 0
+\end{pmatrix}
+\]
+
+Here, a partial permutation of layers (2 and 3) appears as the optimal strategy.
+
+\subsubsection{Configuration 3: biomass initially in layer 3}
+
+The maximal total biomass obtained is:
+\[
+B_{\text{tot}} = 52.90 \ \mathrm{Kg}
+\]
+
+The optimal mixing matrix is:
+\[
+\mathbf{M}_1 =
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+\]
+
+This configuration corresponds to no mixing between layers,
+indicating that maintaining the biomass in layer 3 is optimal.
+
+
+\subsubsection{Comparative Analysis}
+
+These results show that the optimal mixing matrix depends strongly on the initial configuration of the basin.
+When biomass is localized in an inherently favorable layer,
+no mixing is optimal.
+Conversely, in less favorable configurations,
+vertical mixing allows biomass to be redistributed to more productive layers. We see that the optimal matrices allocate biomass to the last layer (the deepest one).
+Indeed, the $\mu$ values of each layer are the following :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Layer} & \textbf{$\mu$ (s$^{-1}$)} \\
+\hline
+Layer 1 & $1.4198 \times 10^{-5}$ \\
+Layer 2 & $1.4883 \times 10^{-5}$ \\
+Layer 3 & $1.5586 \times 10^{-5}$ \\
+\hline
+\end{tabular}
+\caption{Growth rates $\mu$ for each initial layer configuration}
+\label{tab:mu_layers}
+\end{table}
+
+Therefore the last layer has the biggest growth rate.
+
+\subsection{other initial configurations, 5 layers}
+
+\subsubsection{Configuration 1: biomass initially in layer 1}
+After 750 $s$ of growth, the total biomass obtained is:
+\[
+B_{\text{tot}} = 50.571 \ \mathrm{Kg}
+\]
+
+Optimal mixing matrix:
+\[
+\mathbf{M}_1 =
+\begin{pmatrix}
+0 & 0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 \\
+1 & 0 & 0 & 0 & 0
+\end{pmatrix}
+\]
+
+\subsubsection{Configuration 2: biomass initially in layer 2}
+
+Total biomass obtained:
+\[
+B_{\text{tot}} = 50.577 \ \mathrm{Kg}
+\]
+
+Optimal mixing matrix:
+\[
+\mathbf{M}_2 =
+\begin{pmatrix}
+1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 \\
+0 & 1 & 0 & 0 & 0
+\end{pmatrix}
+\]
+
+\subsubsection{Configuration 3: biomass initially in layer 3}
+
+Total biomass obtained:
+\[
+B_{\text{tot}} = 50.584 \ \mathrm{Kg}
+\]
+
+Optimal mixing matrix:
+\[
+\mathbf{M}_3 =
+\begin{pmatrix}
+1 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 1 & 0 & 0
+\end{pmatrix}
+\]
+
+\subsubsection{Configuration 4: biomass initially in layer 4}
+
+Total biomass obtained:
+\[
+B_{\text{tot}} = 50.594 \ \mathrm{Kg}
+\]
+
+Optimal mixing matrix:
+\[
+\mathbf{M}_4 =
+\begin{pmatrix}
+0 & 1 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 1 & 0
+\end{pmatrix}
+\]
+
+\subsubsection{Configuration 5: biomass initially in layer 5}
+
+Total biomass obtained:
+\[
+B_{\text{tot}} = 50.604 \ \mathrm{Kg}
+\]
+
+Optimal mixing matrix:
+\[
+\mathbf{M}_5 =
+\begin{pmatrix}
+1 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1
+\end{pmatrix}
+\]
+\end{document}

@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{subcaption}
+\usepackage{float}
+
+\title{Mixing Optimization : Optimal Stochastic Mixing-Matrix}
+
+
+\author{Octave Litrico}
+\date{\today}
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Now that we have found a way to determine the best permutation matrix for the water pond, let us now focus on a more general case : the column stochastic matrices. 
+The initial problem is indeed defined with $P$ a $N \times N$ column-stocastic matrix. To optimize on this infinite space, we will have to use a differentiable program.
+We have chosen the **torch** python library to do so. In the update fonction, we have to conevrt every numpy list and array into a torch variable. This will allow us to compute torch differentiation with these variables. 
+Furthermore, to process the matrix constraints (non negative coefficients and every column must sum 1), we will use the softmax function, so that the variable we will differentiate with respect to will be an unconstrained matrix $Q$.
+
