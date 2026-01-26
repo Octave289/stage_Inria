@@ -481,14 +481,14 @@ And
 
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{C:/Users/octav/OneDrive/modélisation algues/mu en fonction de z.png}
+        \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/mu en fonction de z.png}
         \caption{$\mu\,(d^{-1})$ depending on $z$}
         \label{fig:mu_z}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{C:/Users/octav/OneDrive/modélisation algues/mu en fonction de I.png}
+        \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/mu en fonction de I.png}
         \caption{$\mu\,(d^{-1})$ depending on $I$}
         \label{fig:mu_I}
     \end{subfigure}
@@ -497,7 +497,7 @@ And
 
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{C:/Users/octav/OneDrive/modélisation algues/I en fonction de z.png}
+        \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/I en fonction de z.png}
         \caption{$I$ depending on $z$}
         \label{fig:I_z}
     \end{subfigure}
@@ -585,7 +585,7 @@ Therefore the last layer has the biggest growth rate.
 Here is a graphic showing the 6 biomass values corresponding to the 6 possible permutation matrices.
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\textwidth]{C:/Users/octav/OneDrive/modélisation algues/biomasses recherche matrice N=3.png}
+    \includegraphics[width=0.6\textwidth]{C:/Users/octav/Desktop/modélisation algues/biomasses recherche matrice N=3.png}
         \caption{biomass values}
         \label{fig:t0}
 \end{figure}
@@ -683,7 +683,7 @@ Here again, let us represent the successive biomass values associated to the tes
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\textwidth]{C:/Users/octav/OneDrive/modélisation algues/biomasses recherche matrice N=5.png}
+\includegraphics[width=0.6\textwidth]{C:/Users/octav/Desktop/modélisation algues/biomasses recherche matrice N=5.png}
 \end{figure}
 \subsubsection{Configuration 2: biomass initially in layer 2}
 
@@ -793,12 +793,29 @@ Let us now use the original objective function, i.e the final biomass after a gi
 
 \subsection{optimizer parameters}
 
+The Adam optimizer (Adaptive Moment Estimation) combines momentum-based gradient descent with per-parameter adaptive learning rates. 
+At each iteration $t$, it maintains an exponential moving average of the gradient $m_t$ (first moment) and of the squared gradient $v_t$ (second moment), defined as
+\[
+m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t, \qquad
+v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2,
+\]
+where $g_t$ denotes the gradient of the loss with respect to the parameters. These moment estimates are corrected for initialization bias as
+\[
+\hat m_t = \frac{m_t}{1-\beta_1^t}, \qquad
+\hat v_t = \frac{v_t}{1-\beta_2^t}.
+\]
+The parameter update is then given by
+\[
+\theta_{t+1} = \theta_t - \alpha \frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon},
+\]
+where $\alpha$ is the global learning rate, while $\beta_1$ and $\beta_2$ control the exponential decay rates of the first and second moments, respectively, governing the trade-off between stability and responsiveness of the optimization process.
+
 In order to choose an appropriate learning rate for the Adam optimization algorithm, we performed a learning rate finder experiment. The principle consists in running a single optimization trajectory while progressively increasing the learning rate and recording the corresponding value of the loss. 
 The resulting curve, representing the loss as a function of the learning rate, is shown here after.
 
-\begin{figure}
+\begin{figure}[H]
 \centering
-\includegraphics[\textwidth]{C:/Users/octav/OneDrive/modélisation algues/biomasses recherche matrice N=3.png}
+\includegraphics[width=0.9\textwidth]{C:/Users/octav/Desktop/modélisation algues/learning_rate_finder.png}
 \end{figure}
 \subsubsection{learning rate finder, loss vs lr}
 
@@ -808,9 +825,9 @@ As a consequence, no critical learning rate leading to divergence is observed. W
 
 Once the learning rate is fixed, we analyze the convergence of the optimization by plotting the loss as a function of the iteration number. 
 
-\begin{figure}
+\begin{figure}[H]
 \centering
-\includegraphics[\textwidth]{C:/Users/octav/OneDrive/modélisation algues/adam_steps_u=0.001.png}
+\includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/adam_steps_u=0.001.png}
 \end{figure}
 \subsubsection{loss vs iterations}
 The curve exhibits a clear plateau after a given number of iterations, indicating that further optimization steps do not significantly improve the objective value. 

@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1769425362.6927 "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" "Mixing_matrix_optimization.pdf" "Mixing_matrix_optimization" 1769425368.09757 2
+["pdflatex"] 1769465987.56623 "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" "Mixing_matrix_optimization.pdf" "Mixing_matrix_optimization" 1769465989.91353 2
   "C:/Users/octav/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1765190426 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/octav/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1000.pk" 1768209275 25420 3681a4d0cc8a4d8c3f26a3126c8e242f ""
   "C:/Users/octav/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1200.pk" 1763721389 31952 64d28f82427a09589e08036c6fd8a703 ""
@@ -174,15 +174,16 @@
   "C:/Users/octav/AppData/Local/Programs/MiKTeX/tex/latex/pgf/utilities/pgfrcs.sty" 1673775190 325 f9f16d12354225b7dd52a3321f085955 ""
   "C:/Users/octav/AppData/Local/Programs/MiKTeX/tex/latex/tools/calc.sty" 1700599895 10214 547fd4d29642cb7c80bf54b49d447f01 ""
   "C:/Users/octav/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "C:/Users/octav/OneDrive/modélisation algues/I en fonction de z.png" 1768300809 17070 7a3f1b7c538148762a605bf28227ec2c ""
-  "C:/Users/octav/OneDrive/modélisation algues/adam_steps_u=0.001.png" 0 -1 0 ""
-  "C:/Users/octav/OneDrive/modélisation algues/biomasses recherche matrice N=3.png" 1768817777 11168 e2e946e75bfe6d10c32271716a17ccb5 ""
-  "C:/Users/octav/OneDrive/modélisation algues/biomasses recherche matrice N=5.png" 1768816786 13969 46184d310c24e5dcbd53080b49cf5e5d ""
-  "C:/Users/octav/OneDrive/modélisation algues/mu en fonction de I.png" 1768298027 17590 7d742dad2b95c0b58ed1dcd6de458bb4 ""
-  "C:/Users/octav/OneDrive/modélisation algues/mu en fonction de z.png" 1768298013 17821 6b8cbca235b41c6f9866fce1c3f459b2 ""
-  "Mixing_matrix_optimization.aux" 1769425366 5828 d0be0dfded23895c68ef607e3b132d7c "pdflatex"
-  "Mixing_matrix_optimization.tex" 1769076011 38555 1ea77c5b930ca36c63d66cc3ff2210fd ""
-  "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" 1769076011 38555 1ea77c5b930ca36c63d66cc3ff2210fd ""
+  "C:/Users/octav/Desktop/modélisation algues/I en fonction de z.png" 1768300809 17070 7a3f1b7c538148762a605bf28227ec2c ""
+  "C:/Users/octav/Desktop/modélisation algues/adam_steps_u=0.001.png" 1769035315 22756 4193fdd51f3fcca7f6adf512cb912121 ""
+  "C:/Users/octav/Desktop/modélisation algues/biomasses recherche matrice N=3.png" 1768817777 11168 e2e946e75bfe6d10c32271716a17ccb5 ""
+  "C:/Users/octav/Desktop/modélisation algues/biomasses recherche matrice N=5.png" 1768816786 13969 46184d310c24e5dcbd53080b49cf5e5d ""
+  "C:/Users/octav/Desktop/modélisation algues/learning_rate_finder.png" 1769075010 22384 6273d7ae510891dcf29d5af28dbd8834 ""
+  "C:/Users/octav/Desktop/modélisation algues/mu en fonction de I.png" 1768298027 17590 7d742dad2b95c0b58ed1dcd6de458bb4 ""
+  "C:/Users/octav/Desktop/modélisation algues/mu en fonction de z.png" 1768298013 17821 6b8cbca235b41c6f9866fce1c3f459b2 ""
+  "Mixing_matrix_optimization.aux" 1769465989 5828 69ac9aaf5e1b44f16eb96fee7c974afb "pdflatex"
+  "Mixing_matrix_optimization.tex" 1769465975 39570 d630ae899e8baf2510c7ab07f0756b86 ""
+  "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" 1769465975 39570 d630ae899e8baf2510c7ab07f0756b86 ""
   (generated)
   "Mixing_matrix_optimization.aux"
   "Mixing_matrix_optimization.log"
