@@ -11,14 +11,6 @@ from matplotlib.animation import FuncAnimation
 #constantes :
 #####################
 
-I_s = 1500
-epsilon = 4.6
-k_d = 2.99*10e-5
-k_r = 4.8*10e-5
-k_h = 3.64*10e-5
-tau = 6.849
-sigma_H = 2.9*10e-4
-
 
 
 def bassin_initial(f, N_lignes, nb_colonnes, l, h):
@@ -155,7 +147,7 @@ def mise_a_jour_decentree(X1, p, N_lignes, nb_colonnes, L, H, D, u, delta_t):
     return X_tmp
 
 def mise_a_jour_terme_source(X1, p, N_lignes, nb_colonnes, L, H, D, u, delta_t, 
-                             i_s=I_s, eps=epsilon, k_d=k_d, k_r=k_r, k_h=k_h, tau=tau, sigma_H=sigma_H): #terme de transport décentré
+                             i_s, eps, k_d, k_r, k_h, tau, sigma_H): #terme de transport décentré
 
 
     delta_x = L / nb_colonnes
@@ -208,9 +200,22 @@ SCHEMAS = {
     }
 }
 
-def modèle_stochastique(X, t, N_lignes, nb_colonnes, p, L, H, D, u, CFL, schema="advection_diffusion_centrée",
+def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
                         compare=False, f=None, alpha=None, beta=None, gamma=None):
-    
+    N_lignes = params["N"]
+    nb_colonnes = params["nb_colonnes_default"]
+    L = params["L"]
+    H = params["H"]
+    D = params["D"]          # mu = D
+    u = params["u"]
+    CFL = params["CFL"]
+    i_s = params["I_s"]
+    eps = params["epsilon"]
+    k_d = params["k_d"]
+    k_r = params["k_r"]
+    k_h = params["k_h"]
+    tau = params["tau"]
+    sigma_H = params["sigma_H"]
     delta_x = L / nb_colonnes
 
     schema_cfg = SCHEMAS[schema]
@@ -228,7 +233,7 @@ def modèle_stochastique(X, t, N_lignes, nb_colonnes, p, L, H, D, u, CFL, schema
     erreurs = [] if compare else None
 
     for step in range(nb_itérations + 1):
-        X1 = Mise_a_jour(X1, p, N_lignes, nb_colonnes, L, H, D, u, delta_t)
+        X1 = Mise_a_jour(X1, p, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
         if compare:
             X_exa = solution_exacte(f, step * delta_t, N_lignes, nb_colonnes,
                                              p, L, H, D, alpha, beta, gamma)
@@ -237,7 +242,7 @@ def modèle_stochastique(X, t, N_lignes, nb_colonnes, p, L, H, D, u, CFL, schema
 
     if t != nb_itérations * delta_t:
         new_delta_t = t - nb_itérations * delta_t
-        X1 = Mise_a_jour(X1, p, N_lignes, nb_colonnes, L, H, D, u, new_delta_t)
+        X1 = Mise_a_jour(X1, p, N_lignes, nb_colonnes, L, H, D, u, new_delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
 
     if compare:
         X_exa = solution_exacte(f, t, N_lignes, nb_colonnes,
@@ -252,16 +257,17 @@ def modèle_stochastique(X, t, N_lignes, nb_colonnes, p, L, H, D, u, CFL, schema
 
 def modèle_stochastique_une_itération(
                         X,  # tableau des valeurs X_i,j  
-                        N_lignes,
-                        nb_colonnes,
                         P,
-                        L,
-                        H,
-                        D,
-                        u,
-                        CFL
+                        params
                         ):
-    return modèle_stochastique(X, CFL*L*L/(D*nb_colonnes*nb_colonnes), N_lignes, nb_colonnes, P, L, H, D, u, CFL)
+    N_lignes = params["N"]
+    nb_colonnes = params["nb_colonnes_default"]
+    L = params["L"]
+    H = params["H"]
+    D = params["D"]          # mu = D
+    u = params["u"]
+    CFL = params["CFL"]
+    return modèle_stochastique(X, CFL*L*L/(D*nb_colonnes*nb_colonnes), P, params)
 
 #il faut à présent appliquer le modèle à quelques exemples que l'on comparera plus tard à l'autre modèle
 
@@ -382,13 +388,11 @@ def X_ini_patch(N_lignes, nb_colonnes, i0=None, j0=None, size=1, value=1.0):
 ################################################
 
 
-def fonction_objectif(X, t, N_lignes, nb_colonnes, p, L, H, D, u, CFL):
-    X = modèle_stochastique(X, t, N_lignes, nb_colonnes, p, L, H, D, u, CFL, "advection_diffusion_terme_source",
+def fonction_objectif(X, t, p, params):
+    
+    X = modèle_stochastique(X, t, p, params, "advection_diffusion_terme_source",
                             False, None, None, None, None)
-    masse_totale_algues = 0
-    for ligne in X:
-        for case in ligne :
-            masse_totale_algues += case
+    masse_totale_algues = sum(sum(ligne) for ligne in X)
     return masse_totale_algues
 
 def matrix_from_list(liste, N_lignes):
@@ -397,10 +401,10 @@ def matrix_from_list(liste, N_lignes):
         p[i, liste[i]] = 1
     return p
 
-def test(liste, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
-                     schema):
+def test(liste, X, t, params):
+    N_lignes = params["N"]
     p = matrix_from_list(liste, N_lignes)
-    masse_totale_algues = fonction_objectif(X, t, N_lignes, nb_colonnes, p, L, H, D, u, CFL)
+    masse_totale_algues = fonction_objectif(X, t, p, params)
     return(masse_totale_algues, p)
 
 def test_bis(liste, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
@@ -419,36 +423,39 @@ def test_bis(liste, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
     return(masse_totale_algues, p)
 
 
-def meilleure_matrice_de_permutation(X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
+def meilleure_matrice_de_permutation(X, t, params,
                      schema="advection_diffusion_terme_source"):
+    N_lignes = params["N"]
+    nb_colonnes = params["nb_colonnes_default"]
+    L = params["L"]
+    H = params["H"]
+    D = params["D"]          # mu = D
+    u = params["u"]
+    CFL = params["CFL"]
     meilleure_masse = 0
     meilleure_matrice = np.identity(N_lignes)
     liste_biomasses = []
-    def generer_matrice(n, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
-                     schema, liste=None):#algorithme de Heap
+    def generer_matrice(n, X, t, params,
+                       liste=None):#algorithme de Heap
         nonlocal meilleure_masse, meilleure_matrice
         if liste is None:
             liste = list(range(N_lignes))
         if n==1:
-            masse_totale_algues, p = test(liste, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
-                     schema)
+            masse_totale_algues, p = test(liste, X, t, params)
             liste_biomasses.append(masse_totale_algues)
             if masse_totale_algues > meilleure_masse:
                 meilleure_masse = masse_totale_algues
                 meilleure_matrice = p
         else:
-            generer_matrice(n-1, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
-                     schema, liste)
+            generer_matrice(n-1, X, t, params, liste)
         for i in range(n-1):
             if n%2==0:
                 liste[i], liste[n-1] = liste[n-1], liste[i]
             else:
                 liste[0], liste[n-1] = liste[n-1], liste[0]
-            generer_matrice(n-1, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
-                     schema, liste) 
+            generer_matrice(n-1, X, t, params, liste) 
             
-    generer_matrice(N_lignes, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
-                     schema)
+    generer_matrice(N_lignes, X, t, params)
     return (meilleure_masse, meilleure_matrice, liste_biomasses)
 
 

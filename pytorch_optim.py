@@ -1,26 +1,18 @@
 import numpy as np
 import torch
 
-I_s = 1500
-epsilon = 0.214
-k_d = 2.99*10e-5
-k_r = 4.8*10e-5
-k_h = 3.64*10e-5
-tau = 6.849
-sigma_H = 2.9*10e-4
-
 #Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
 #P = torch.softmax(Q, dim=0)
 
-def mise_a_jour_terme_source_torch(X, P, N_lignes, nb_colonnes, L, H, mu, u, delta_t):
+def mise_a_jour_terme_source_torch(X, P, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H):
     delta_x = L / nb_colonnes
-    nu = mu * delta_t / (delta_x * delta_x)
+    nu = D * delta_t / (delta_x * delta_x)
 
     K = torch.tensor(u, dtype=X.dtype, device=X.device) * delta_t / delta_x 
     X_new = X.clone()
 
     for i in range(N_lignes):
-        I = I_s * np.exp(-epsilon * H / N_lignes * i)
+        I = i_s * np.exp(-eps * H / N_lignes * i)
         A = 1.0 / (k_d/k_r * tau * (sigma_H*I)**2 + tau*sigma_H*I + 1)
         taux_croiss = k_h * sigma_H * I * A
 
@@ -51,26 +43,41 @@ def mise_a_jour_terme_source_torch(X, P, N_lignes, nb_colonnes, L, H, mu, u, del
 
     return X_new
 
-def modèle_stochastique_torch(X, t, N_lignes, nb_colonnes, p, L, H, mu, u, CFL):
-    
+def modele_stochastique_torch(X, t, P, params):
+    # --- Paramètres ---
+    N_lignes = params["N"]
+    nb_colonnes = params["nb_colonnes_default"]
+    L = params["L"]
+    H = params["H"]
+    D = params["D"]          
+    u = params["u"]
+    CFL = params["CFL"]
+    i_s = params["I_s"]
+    eps = params["epsilon"]
+    k_d = params["k_d"]
+    k_r = params["k_r"]
+    k_h = params["k_h"]
+    tau = params["tau"]
+    sigma_H = params["sigma_H"]
+    # --- Discrétisation ---
     delta_x = L / nb_colonnes
+    delta_t = CFL * delta_x**2 / (2 * D + abs(u[0]) * delta_x)
 
-    delta_t = CFL * delta_x**2 / (2*mu + abs(u[0])*delta_x)
-
-    nb_itérations = int(t / delta_t)
+    nb_iterations = int(t / delta_t)
 
     if t == 0:
         return X
 
-    nu = mu * delta_t / (delta_x * delta_x)
     X1 = X.clone()
 
-    for step in range(nb_itérations + 1):
-        X1 = mise_a_jour_terme_source_torch(X1, p, N_lignes, nb_colonnes, L, H, mu, u, delta_t)
+    # --- Boucle temporelle ---
+    for _ in range(nb_iterations + 1):
+        X1 = mise_a_jour_terme_source_torch(X1, P, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
 
-    if t != nb_itérations * delta_t:
-        new_delta_t = t - nb_itérations * delta_t
-        X1 = mise_a_jour_terme_source_torch(X1, p, N_lignes, nb_colonnes, L, H, mu, u, new_delta_t)
+    # --- Dernier pas fractionnaire ---
+    if t != nb_iterations * delta_t:
+        new_delta_t = t - nb_iterations * delta_t
+        X1 = mise_a_jour_terme_source_torch(X1, P, N_lignes, nb_colonnes, L, H, D, u, new_delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
 
     return X1
 
@@ -86,21 +93,34 @@ def X_ini_one_layer_torch(N_lignes, nb_colonnes, k=0, value=1.0):
     X[k, :] = torch.tensor(value)
     return X
 
-def X_ini_uniform(N_lignes, nb_colonnes, value=1.0):
+def X_ini_uniform_torch(N_lignes, nb_colonnes, value=1.0):
     X = torch.zeros((N_lignes, nb_colonnes))
     for i in range(N_lignes):
         X[i, :] = torch.tensor(value)
     return X
 
-def fonction_objectif_torch(X0,t, N_lignes, nb_colonnes, p, L, H, mu, u, CFL):
-    X1 = modèle_stochastique_torch(X0, t, N_lignes, nb_colonnes, p, L, H, mu, u, CFL)
+def fonction_objectif_torch(X0, t, p, params):
+    X1 = modele_stochastique_torch(X0, t, p, params)
     return torch.sum(X1)
 
 def fonction_objectif_torch_fast(
-    X0, t, N_lignes, nb_colonnes, P,
-    L, H, mu, u, CFL,
+    X0, t, p, params,
     detach_every=10
 ):
+    N_lignes = params["N"]
+    nb_colonnes = params["nb_colonnes_default"]
+    L = params["L"]
+    H = params["H"]
+    mu = params["D"]          # mu = D
+    u = params["u"]
+    CFL = params["CFL"]
+    i_s = params["I_s"]
+    eps = params["epsilon"]
+    k_d = params["k_d"]
+    k_r = params["k_r"]
+    k_h = params["k_h"]
+    tau = params["tau"]
+    sigma_H = params["sigma_H"]
     delta_x = L / nb_colonnes
     delta_t = CFL * delta_x**2 / (2*mu + abs(u[0])*delta_x)
 
@@ -113,8 +133,8 @@ def fonction_objectif_torch_fast(
 
     for step in range(nb_iterations):
         X = mise_a_jour_terme_source_torch(
-            X, P, N_lignes, nb_colonnes,
-            L, H, mu, u, delta_t
+            X, p, N_lignes, nb_colonnes,
+            L, H, mu, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H
         )
 
         # TRONCATURE DU GRADIENT TEMPOREL
@@ -125,8 +145,8 @@ def fonction_objectif_torch_fast(
     reste = t - nb_iterations * delta_t
     if reste > 0:
         X = mise_a_jour_terme_source_torch(
-            X, P, N_lignes, nb_colonnes,
-            L, H, mu, u, reste
+            X, p, N_lignes, nb_colonnes,
+            L, H, mu, u, reste, i_s, eps, k_d, k_r, k_h, tau, sigma_H
         )
 
     return torch.sum(X)
@@ -154,15 +174,18 @@ def solve_test(X_init):
             print(it, -loss.item())
     return P
 
-def solve(X_init, t, N_lignes, nb_colonnes, L, H, mu, u, CFL):
-    Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
+def solve(X_init, t, params, start_with_matrix=False, M=[[]]):
+    N_lignes = params["N"]
+    if start_with_matrix:
+        Q = torch.nn.Parameter(torch.tensor(M))
+    else:
+        Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
     optimizer = torch.optim.Adam([Q], lr=1e-1)
     biomass_list = []
     for it in range(150):
         optimizer.zero_grad()
-
         P = torch.softmax(Q, dim=0)
-        loss = -fonction_objectif_torch(X_init, t, N_lignes, nb_colonnes, P, L, H, mu, u, CFL)
+        loss = -fonction_objectif_torch(X_init, t, P, params)
         biomass_list.append(-loss.item())
         loss.backward()
         optimizer.step()
