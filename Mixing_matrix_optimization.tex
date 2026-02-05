@@ -446,10 +446,33 @@ This additional term modifies the Courant--Friedrichs--Lewy (CFL) condition and,
 \subsection{introduction of a biomass source term}
 
 In this report, we present first numerical results illustrating the total biomass in the basin after a growth period of $T = 100\,\mathrm{s}$. 
-According to \cite{Liu-Di Lu, 2021}, the algae follow the Han growth model, which is of Haldane if the dynamic of the open state A is at its steady state.
+According to \cite{Liu-Di Lu, 2021}, the algae follow the Han growth model, which is of Haldane if the dynamic of the open state is at its steady state.
 The light intensity follows a Beer-lambert law \cite{Beer-Lambert}:
 \[ I = I_s e^{-\epsilon z}\] 
 With $I_s = 1500 \ \mathrm{m^{-2}\,\mu mol\,s^{-1}}$
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.1]
+
+% Axes
+\draw[->] (0,0) -- (5,0) node[right] {$I(z)$};
+\draw[->] (0,0) -- (0,-4) node[below] {$z$};
+
+% Courbe exponentielle
+\draw[thick, domain=0:4, smooth, variable=\z]
+    plot ({4*exp(-0.8*\z)}, {-\z});
+
+% Annotations
+\node[left] at (0,0) {$I_s$};
+\node[left] at (0,-3.5) {$H$};
+
+\node[right] at (3,-1.2) {$I(z)=I_s e^{-\epsilon z}$};
+
+\end{tikzpicture}
+\caption{Exponential attenuation of light intensity with depth according to the Beer--Lambert law.}
+\label{fig:beer_lambert}
+\end{figure}
+
 The $\epsilon$ light extinction coefficient will be computed once and for all, assuming that the light intensity at depth $H$ is 1\% of the surface light intensity $I_s$. We have :
 \[I(H) = \frac{I_s}{100} = I_s\exp(-\epsilon H)\]
 Therefore, \[\epsilon = \frac{\ln(100)}{H} \approx 4.6\]
@@ -482,14 +505,14 @@ And
     \begin{subfigure}{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/mu en fonction de z.png}
-        \caption{$\mu\,(d^{-1})$ depending on $z$}
+        \subcaption*{(a)}
         \label{fig:mu_z}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/mu en fonction de I.png}
-        \caption{$\mu\,(d^{-1})$ depending on $I$}
+        \subcaption*{(b)}
         \label{fig:mu_I}
     \end{subfigure}
 
@@ -498,10 +521,27 @@ And
     \begin{subfigure}{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/I en fonction de z.png}
-        \caption{$I$ depending on $z$}
+        \subcaption*{(c)}
         \label{fig:I_z}
     \end{subfigure}
+
+    \caption{
+    (a) $\mu\,(d^{-1})$ as a function of $z$ ;
+    (b) $\mu\,(d^{-1})$ as a function of $I$ ;
+    (c) $I$ as a function of $z$
+    }
+    \label{fig:global}
 \end{figure}
+
+
+    \caption{%
+    (a) $\mu\,(d^{-1})$ as a function of $z$ ;
+    (b) $\mu\,(d^{-1})$ as a function of $I$ ;
+    (c) $I$ as a function of $z$
+    }
+    \label{fig:mu_I_z}
+\end{figure}
+
 The simulations are performed for a single layer, and therefore without any mixing effects. 
 The only varying parameter is the water velocity $u$. For a discretization of 500 points, we impose a uniform initial concentration and an initial total biomass of 50 Kg.
 After an hour of growth, we get the following total biomass table for different current speed values.
@@ -582,19 +622,12 @@ Layer 3 & $2.8777 \times 10^{-5}$ & 69.86 \\
 \end{table}
 
 Therefore the last layer has the biggest growth rate.
-Here is a graphic showing the 6 biomass values corresponding to the 6 possible permutation matrices.
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\textwidth]{C:/Users/octav/Desktop/modélisation algues/biomasses recherche matrice N=3.png}
-        \caption{biomass values}
-        \label{fig:t0}
-\end{figure}
 
 \subsubsection{Configuration 1: biomass initially in layer 1}
 
 The maximal total biomass obtained is:
 \[
-B_{\text{tot}} = 50.369 \quad \mathrm{Kg}
+B_{\text{tot}} = 50.301 \quad \mathrm{Kg}
 \]
 
 The optimal mixing matrix is:
@@ -608,6 +641,12 @@ The optimal mixing matrix is:
 \]
 
 This matrix induces a permutation of layers which induces the allocation of layer 1 in position 2, corresponding to the largest growth coefficient.
+Here is a graphic representing the total algae mass in each layer as a function of time, with the latter permutation matrix.
+\begin{figure}
+    \includegraphics[0.5\textwidth]{C:/Users/octav/Desktop/modélisation algues/masse_par_couche_N=3.png}
+    \caption{biomass in each layer through time}
+    \label{fig:t0}
+\end{figure}
 
 \subsubsection{Configuration 2: biomass initially in layer 2}
 
@@ -790,8 +829,8 @@ The first layer is indeed moved to layer 3 by 99 percent.
 
 
 Let us now use the original objective function, i.e the final biomass after a given growth period $T$. 
-
-\subsection{optimizer parameters}
+As before, the growth time remains $T = 300 s$ and the initial conditions are that the total biomass is in layer 1.
+\subsubsection{optimizer parameters}
 
 The Adam optimizer (Adaptive Moment Estimation) combines momentum-based gradient descent with per-parameter adaptive learning rates. 
 At each iteration $t$, it maintains an exponential moving average of the gradient $m_t$ (first moment) and of the squared gradient $v_t$ (second moment), defined as
@@ -842,7 +881,10 @@ With an initial pond in which the biomass is only in the first layer, the solver
 0.9553 & 0.6737 & 0.9938
 \end{pmatrix}
 \]
-The immediate problem we face is the algorithm complexity. With $T = 50\text{s}$ and a three layer pond, the solver takes about one hour to return the approximate optimal matrix. 
+
+this matrix corresponds to a situation in which the final biomass is $50.301 \text{Kg}$. This is approximately the same result than the permutation matrix case. 
+We can now begin the ADAM algorithm starting from the best permutation matrix and see if we obtain a better result. And indeed, the optimisation returns a new biomass of 
+The immediate problem we face is the algorithm complexity. With $T = 300\text{s}$ and a three layer pond, the solver takes about one hour to return the approximate optimal matrix. 
 
 
 \paragraph{Computational complexity.}
