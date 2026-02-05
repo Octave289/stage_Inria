@@ -224,6 +224,7 @@ def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
 
     nb_itérations = int(t / delta_t)
 
+    #masse_par_couche = [[] for _ in range(N_lignes)]
     if t == 0:
         return np.copy(X)
 
@@ -234,6 +235,8 @@ def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
 
     for step in range(nb_itérations + 1):
         X1 = Mise_a_jour(X1, p, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
+        #for i in range(N_lignes):
+            #masse_par_couche[i].append(sum(X1[i, :]))
         if compare:
             X_exa = solution_exacte(f, step * delta_t, N_lignes, nb_colonnes,
                                              p, L, H, D, alpha, beta, gamma)
@@ -251,7 +254,7 @@ def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
         erreurs.append(erreur)
         return X1, np.max(erreurs)
     else:
-        return X1
+        return X1#, masse_par_couche
 
 # je construit un autre programme similaire mais qui ne fait qu'une itération en temps :
 
