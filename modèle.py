@@ -426,12 +426,6 @@ def test_bis(liste, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
 def meilleure_matrice_de_permutation(X, t, params,
                      schema="advection_diffusion_terme_source"):
     N_lignes = params["N"]
-    nb_colonnes = params["nb_colonnes_default"]
-    L = params["L"]
-    H = params["H"]
-    D = params["D"]          # mu = D
-    u = params["u"]
-    CFL = params["CFL"]
     meilleure_masse = 0
     meilleure_matrice = np.identity(N_lignes)
     liste_biomasses = []
