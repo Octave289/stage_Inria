@@ -263,6 +263,19 @@ def lr_finder(
 
     return np.array(lrs), np.array(losses)
 
+
+#####autre : méthode de Newton à la main, avec GMRES
+
+def matrix_to_vector(p):
+    (...)
+
+def hessian(X, t, p, params):
+    v = matrix_to_vector(p)
+    H = np.zeros((len(v), len(v)))
+    
+
+
+
 #####autre méthode (Newton + descente gradient)
 
 def LBFGS(X_init, t, N_lignes, nb_colonnes, L, H, mu, u, CFL):
