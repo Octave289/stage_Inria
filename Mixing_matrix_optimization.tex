@@ -504,14 +504,14 @@ And
 
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/mu en fonction de z.png}
+        \includegraphics[width=\textwidth]{mu en fonction de z.png}
         \subcaption*{(a)}
         \label{fig:mu_z}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/mu en fonction de I.png}
+        \includegraphics[width=\textwidth]{mu en fonction de I.png}
         \subcaption*{(b)}
         \label{fig:mu_I}
     \end{subfigure}
@@ -520,7 +520,7 @@ And
 
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/I en fonction de z.png}
+        \includegraphics[width=\textwidth]{I en fonction de z.png}
         \subcaption*{(c)}
         \label{fig:I_z}
     \end{subfigure}
@@ -643,7 +643,7 @@ The optimal mixing matrix is:
 This matrix induces a permutation of layers which induces the allocation of layer 1 in position 2, corresponding to the largest growth coefficient.
 Here is a graphic representing the total algae mass in each layer as a function of time, with the latter permutation matrix.
 \begin{figure}
-    \includegraphics[0.5\textwidth]{C:/Users/octav/Desktop/modélisation algues/masse_par_couche_N=3.png}
+    \includegraphics[0.5\textwidth]{masse_par_couche_N=3.png}
     \caption{biomass in each layer through time}
     \label{fig:t0}
 \end{figure}
@@ -722,7 +722,7 @@ Here again, let us represent the successive biomass values associated to the tes
 
 \begin{figure}
 \centering
-\includegraphics[width=0.6\textwidth]{C:/Users/octav/Desktop/modélisation algues/biomasses recherche matrice N=5.png}
+\includegraphics[width=0.6\textwidth]{biomasses recherche matrice N=5.png}
 \end{figure}
 \subsubsection{Configuration 2: biomass initially in layer 2}
 
@@ -854,7 +854,7 @@ The resulting curve, representing the loss as a function of the learning rate, i
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{C:/Users/octav/Desktop/modélisation algues/learning_rate_finder.png}
+\includegraphics[width=0.9\textwidth]{learning_rate_finder.png}
 \end{figure}
 \subsubsection{learning rate finder, loss vs lr}
 
@@ -866,7 +866,7 @@ Once the learning rate is fixed, we analyze the convergence of the optimization 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{C:/Users/octav/Desktop/modélisation algues/adam_steps_u=0.001.png}
+\includegraphics[width=\textwidth]{adam_steps_u=0.001.png}
 \end{figure}
 \subsubsection{loss vs iterations}
 The curve exhibits a clear plateau after a given number of iterations, indicating that further optimization steps do not significantly improve the objective value. 
@@ -874,16 +874,33 @@ Based on this observation, the optimization is stopped at this iteration count, 
 
 With an initial pond in which the biomass is only in the first layer, the solver returns the following matrix :
 \[
-\mathbf{P} =
 \begin{pmatrix}
-0.0137 & 0.0294 & 0.0018 \\
-0.0310 & 0.2969 & 0.0044 \\
-0.9553 & 0.6737 & 0.9938
+1.671 \times 10^{-4} & 1.075 \times 10^{-4} & 3.199 \times 10^{-3} \\
+9.947 \times 10^{-1} & 9.992 \times 10^{-1} & 8.100 \times 10^{-1} \\
+5.178 \times 10^{-3} & 7.207 \times 10^{-4} & 1.868 \times 10^{-1}
 \end{pmatrix}
 \]
 
+
 this matrix corresponds to a situation in which the final biomass is $50.301 \text{Kg}$. This is approximately the same result than the permutation matrix case. 
-We can now begin the ADAM algorithm starting from the best permutation matrix and see if we obtain a better result. And indeed, the optimisation returns a new biomass of 
+The optimal permutation matrix was indeed :
+\[
+\mathbf{M}_1 =
+\begin{pmatrix}
+0 & 0 & 1 \\
+1 & 0 & 0 \\
+0 & 1 & 0
+\end{pmatrix}
+\]
+We can now begin the ADAM algorithm starting from this matrix and see if we obtain a better result. The final biomass result stays the same, while the optimisation returns a new matrix :
+\[
+\begin{pmatrix}
+7.768 \times 10^{-4} & 3.514 \times 10^{-4} & 3.007 \times 10^{-3} \\
+9.933 \times 10^{-1} & 9.974 \times 10^{-1} & 9.429 \times 10^{-1} \\
+5.955 \times 10^{-3} & 2.301 \times 10^{-3} & 5.411 \times 10^{-2}
+\end{pmatrix}
+\]
+
 The immediate problem we face is the algorithm complexity. With $T = 300\text{s}$ and a three layer pond, the solver takes about one hour to return the approximate optimal matrix. 
 
 
