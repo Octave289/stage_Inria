@@ -267,12 +267,40 @@ def lr_finder(
 #####autre : méthode de Newton à la main, avec GMRES
 
 def matrix_to_vector(p):
-    (...)
+    return p.reshape(-1)
 
-def hessian(X, t, p, params):
+def vector_to_matrix(v, n):
+    return v.reshape((n, n))
+
+def J(p):
+    #return fonction_objectif_torch(X, t, p, params)
+    return(sum(sum(p@p)))
+
+def hessian(p, h):
+    n = p.shape[0]
     v = matrix_to_vector(p)
-    H = np.zeros((len(v), len(v)))
-    
+    N = n * n
+    H = np.zeros((N, N))
+
+    def J_vec(v):
+        return J(vector_to_matrix(v, n))
+
+    for i in range(N):
+        for j in range(N):
+            ei = np.zeros(N); ei[i] = 1
+            ej = np.zeros(N); ej[j] = 1
+
+            H[i, j] = (
+                J_vec(v + h*ei + h*ej)
+                - J_vec(v + h*ei)
+                - J_vec(v + h*ej)
+                + J_vec(v)
+            ) / h**2
+
+    return H
+
+def test():
+    return 5
 
 
 
@@ -294,5 +322,7 @@ def LBFGS(X_init, t, N_lignes, nb_colonnes, L, H, mu, u, CFL):
         if it % 50 == 0:
             print(it, -loss.item())
     return P
+
+
 
 
