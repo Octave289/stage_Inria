@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import modèle 
 
 #Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
 #P = torch.softmax(Q, dim=0)
@@ -174,6 +175,30 @@ def solve_test(X_init):
             print(it, -loss.item())
     return P
 
+
+##### test gradient
+
+def test_gradient(X_init, t, params):
+    N_lignes = params["N"]
+    errors = []
+    for k in range(1, 5):
+        epsi = 10**(-k)
+        Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
+        H = torch.softmax(torch.randn(N_lignes, N_lignes), dim=0)
+        P = torch.softmax(Q, dim=0)
+        loss = -fonction_objectif_torch(X_init, t, P, params)
+        loss.backward()
+        grad = torch.softmax(Q.grad, dim=0)
+        error = torch.sum(grad*(H - P)
+                    - (fonction_objectif_torch(X_init, t, (1-epsi)*P + epsi*H, params) 
+                    - fonction_objectif_torch(X_init , t, (1+epsi)*P - epsi*H, params))/(2*epsi))
+        errors.append(error.detach())
+    return(errors)
+
+
+
+##### ADAM method
+
 def solve(X_init, t, params, start_with_matrix=False, M=[[]]):
     N_lignes = params["N"]
     if start_with_matrix:
@@ -264,7 +289,7 @@ def lr_finder(
     return np.array(lrs), np.array(losses)
 
 
-#####autre : méthode de Newton à la main, avec GMRES
+#####autre : méthode de Newton d'ordre 1 à la main, avec GMRES
 
 def matrix_to_vector(p):
     return p.reshape(-1)
@@ -272,10 +297,51 @@ def matrix_to_vector(p):
 def vector_to_matrix(v, n):
     return v.reshape((n, n))
 
+def step_Newton(f, X, h):
+    X_new = np.zeros(X.shape)
+    grad_f = np.zeros(X.shape)
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            X_plus_h = X.copy()
+            X_plus_h[i, j] += h
+            grad_f[i, j] = (f(X_plus_h) - f(X))/h
+    X_new = X + f(X)*grad_f/np.linalg.norm(grad_f, ord=2)**2
+    return(X_new)
+
+def softmax(x, axis=0):
+    x_max = np.max(x, axis=axis, keepdims=True)
+    exp_x = np.exp(x - x_max)
+    return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
+
+
+
+def solve_Newton(X_init, t, params, start_with_matrix=False, M=[[]]):
+    N_lignes = params["N"]
+    if start_with_matrix:
+        P = M.copy
+    else:
+        Q = np.random.randn(N_lignes, N_lignes)
+        P = softmax(Q, axis=0)
+    biomass_list = []
+    def f(X):
+        return(modèle.fonction_objectif(X_init, t, P, params))
+    X_new = X_init.copy()
+    for it in range(100):
+        X_new = step_Newton(f, X_new, 10e-5)   
+        val = f(X_new)
+        biomass_list.append(val)     
+        if it % 10 == 0:
+            print(it, val)
+    return P, biomass_list
+
+
+
+
 def J(p):
     #return fonction_objectif_torch(X, t, p, params)
     return(sum(sum(p@p)))
 
+#### Newton d'ordre 2
 def hessian(p, h):
     n = p.shape[0]
     v = matrix_to_vector(p)
@@ -299,8 +365,7 @@ def hessian(p, h):
 
     return H
 
-def test():
-    return 5
+
 
 
 

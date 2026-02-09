@@ -395,7 +395,7 @@ def fonction_objectif(X, t, p, params):
     
     X = modèle_stochastique(X, t, p, params, "advection_diffusion_terme_source",
                             False, None, None, None, None)
-    masse_totale_algues = sum(sum(ligne) for ligne in X)
+    masse_totale_algues = np.sum(X)
     return masse_totale_algues
 
 def matrix_from_list(liste, N_lignes):
