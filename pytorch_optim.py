@@ -289,7 +289,7 @@ def lr_finder(
     return np.array(lrs), np.array(losses)
 
 
-#####autre : méthode de Newton d'ordre 1 à la main, avec GMRES
+#####autre : méthode de Newton avec GMRES
 
 def matrix_to_vector(p):
     return p.reshape(-1)
@@ -297,16 +297,42 @@ def matrix_to_vector(p):
 def vector_to_matrix(v, n):
     return v.reshape((n, n))
 
-def step_Newton(f, X, h):
-    X_new = np.zeros(X.shape)
-    grad_f = np.zeros(X.shape)
-    for i in range(X.shape[0]):
-        for j in range(X.shape[1]):
-            X_plus_h = X.copy()
-            X_plus_h[i, j] += h
-            grad_f[i, j] = (f(X_plus_h) - f(X))/h
-    X_new = X + f(X)*grad_f/np.linalg.norm(grad_f, ord=2)**2
-    return(X_new)
+def conjugate_gradient(Av, b, x0, tol, max_iter):
+    x = x0
+    r = b - Av(x0)
+    p = np.copy(r)
+    step = 0
+    while np.linalg.norm(r) > tol and step < max_iter:
+        alpha = r@r/p@Av(p)
+        x = x + alpha*p
+        r1 = r - alpha*Av(p)
+        beta = r1@r1/r@r
+        p = r1 + beta*p
+        r = r1
+        step += 1
+    return x
+
+    
+        
+
+def hvp(loss, Q, v):
+    grad = torch.autograd.grad(loss, Q, create_graph=True)[0]
+    hv = torch.autograd.grad(
+        grad, Q, grad_outputs=v, retain_graph=True
+    )[0]
+    return hv
+
+def newton_cg_step(loss, Q, tol=1e-6, max_iter=50):
+    grad = torch.autograd.grad(loss, Q, create_graph=True)[0]
+
+    def Av(v):
+        return hvp(loss, Q, v)
+
+    # CG pour résoudre H p = -grad
+    p = conjugate_gradient(Av, -grad, tol, max_iter)
+    return p
+
+
 
 def softmax(x, axis=0):
     x_max = np.max(x, axis=axis, keepdims=True)
@@ -318,21 +344,19 @@ def softmax(x, axis=0):
 def solve_Newton(X_init, t, params, start_with_matrix=False, M=[[]]):
     N_lignes = params["N"]
     if start_with_matrix:
-        P = M.copy
+        P0 = M.copy
     else:
-        Q = np.random.randn(N_lignes, N_lignes)
-        P = softmax(Q, axis=0)
-    biomass_list = []
-    def f(X):
-        return(modèle.fonction_objectif(X_init, t, P, params))
-    X_new = X_init.copy()
-    for it in range(100):
-        X_new = step_Newton(f, X_new, 10e-5)   
-        val = f(X_new)
-        biomass_list.append(val)     
-        if it % 10 == 0:
-            print(it, val)
-    return P, biomass_list
+        P = P0.clone().requires_grad_(True)
+    for k in range(20):
+        loss_val = J(P)
+        grad = torch.autograd.grad(loss_val, x, create_graph=True)[0]
+
+        if torch.norm(grad) < 10e-5:
+            break
+
+        p = newton_cg_step(loss_val, x)
+        x = x + p   # ou avec line search
+
 
 
 
@@ -341,8 +365,9 @@ def J(p):
     #return fonction_objectif_torch(X, t, p, params)
     return(sum(sum(p@p)))
 
-#### Newton d'ordre 2
-def hessian(p, h):
+
+
+def hessian_approx(p, h):
     n = p.shape[0]
     v = matrix_to_vector(p)
     N = n * n
