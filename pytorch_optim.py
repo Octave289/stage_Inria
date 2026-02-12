@@ -300,9 +300,9 @@ def vector_to_matrix(v, n):
 def conjugate_gradient(Av, b, x0, tol, max_iter):
     x = x0
     r = b - Av(x0)
-    p = np.copy(r)
+    p = r.clone()
     step = 0
-    while np.linalg.norm(r) > tol and step < max_iter:
+    while torch.norm(r) > tol and step < max_iter:
         alpha = r@r/p@Av(p)
         x = x + alpha*p
         r1 = r - alpha*Av(p)
@@ -312,41 +312,49 @@ def conjugate_gradient(Av, b, x0, tol, max_iter):
         step += 1
     return x
 
-    
-        
 
-def hvp(loss, Q, v):
-    grad = torch.autograd.grad(loss, Q, create_graph=True)[0]
+def hvp(loss, x, v):
+    grad = torch.autograd.grad(loss, x, create_graph=True)[0]
     hv = torch.autograd.grad(
-        grad, Q, grad_outputs=v, retain_graph=True
+        grad, x, grad_outputs=v, retain_graph=True
     )[0]
     return hv
 
-def newton_cg_step(loss, Q, tol=1e-6, max_iter=50):
-    grad = torch.autograd.grad(loss, Q, create_graph=True)[0]
+def newton_cg_step(loss, x, tol=1e-5, max_iter=50):
+    grad = torch.autograd.grad(loss, x, create_graph=True)[0]
 
     def Av(v):
-        return hvp(loss, Q, v)
+        return hvp(loss, x, v)
 
     # CG pour résoudre H p = -grad
-    p = conjugate_gradient(Av, -grad, tol, max_iter)
+    p = conjugate_gradient(Av, -grad, x, tol, max_iter)
     return p
 
 
+def Newton(f, x0, max_iter=10, tol=10e-5):
+    x = x0
+    for k in range(max_iter):
+        loss_val = f(x)
+        grad = torch.autograd.grad(loss_val, x, create_graph=True)[0]
+        if torch.norm(grad) < tol:
+            break
+
+        p = newton_cg_step(loss_val, x)
+        x = x + p   # ou avec line search
+    return x
 
 def softmax(x, axis=0):
     x_max = np.max(x, axis=axis, keepdims=True)
     exp_x = np.exp(x - x_max)
     return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
 
-
-
 def solve_Newton(X_init, t, params, start_with_matrix=False, M=[[]]):
     N_lignes = params["N"]
     if start_with_matrix:
-        P0 = M.copy
-    else:
-        P = P0.clone().requires_grad_(True)
+        Q = torch.nn.Parameter(M.copy).requires_grad_(True)
+    else :
+        Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes)).requires_grad_(True)
+    P = torch.softmax(Q, dim=0)
     for k in range(20):
         loss_val = J(P)
         grad = torch.autograd.grad(loss_val, x, create_graph=True)[0]
@@ -356,6 +364,7 @@ def solve_Newton(X_init, t, params, start_with_matrix=False, M=[[]]):
 
         p = newton_cg_step(loss_val, x)
         x = x + p   # ou avec line search
+    return x
 
 
 
