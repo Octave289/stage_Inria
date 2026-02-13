@@ -253,11 +253,12 @@ def solve_fast(
     return torch.softmax(Q, dim=0), biomass_list
 
 def lr_finder(
-    X_init, t, N_lignes, nb_colonnes, L, H, mu, u, CFL,
+    X_init, t, params,
     lr_start=1e-6,
     lr_end=1e-1,
     n_iter=250
 ):
+    N_lignes = params["N"]
     Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
 
     optimizer = torch.optim.Adam([Q], lr=lr_start)
@@ -279,7 +280,7 @@ def lr_finder(
         P = torch.softmax(Q, dim=0)
 
         loss = -fonction_objectif_torch(
-            X_init, t, N_lignes, nb_colonnes, P, L, H, mu, u, CFL
+            X_init, t, P, params
         )
 
         loss.backward()
@@ -344,7 +345,7 @@ def Newton(f, x0, max_iter=10, tol=10e-5):
 
         p = newton_cg_step(loss_val, x)
         x = (x + p).detach().requires_grad_(True)  
-    return x
+    return x, loss_val
 
 def softmax(x, axis=0):
     x_max = np.max(x, axis=axis, keepdims=True)
