@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import torch
-import modèle 
+import modele 
 
 #Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
 #P = torch.softmax(Q, dim=0)
@@ -289,7 +291,7 @@ def lr_finder(
     return np.array(lrs), np.array(losses)
 
 
-#####autre : méthode de Newton avec GMRES
+#####autre : méthode de Newton avec gradient conjugué
 
 def matrix_to_vector(p):
     return p.reshape(-1)
@@ -303,10 +305,10 @@ def conjugate_gradient(Av, b, x0, tol, max_iter):
     p = r.clone()
     step = 0
     while torch.norm(r) > tol and step < max_iter:
-        alpha = r@r/p@Av(p)
+        alpha = r@r/(p@Av(p))
         x = x + alpha*p
         r1 = r - alpha*Av(p)
-        beta = r1@r1/r@r
+        beta = r1@r1/(r@r)
         p = r1 + beta*p
         r = r1
         step += 1
@@ -320,14 +322,15 @@ def hvp(loss, x, v):
     )[0]
     return hv
 
-def newton_cg_step(loss, x, tol=1e-5, max_iter=50):
+def newton_cg_step(loss, x, tol=1e-5, max_iter=20):
     grad = torch.autograd.grad(loss, x, create_graph=True)[0]
 
     def Av(v):
         return hvp(loss, x, v)
 
     # CG pour résoudre H p = -grad
-    p = conjugate_gradient(Av, -grad, x, tol, max_iter)
+    p0 = torch.zeros_like(x)
+    p = conjugate_gradient(Av, -grad, p0, tol, max_iter)
     return p
 
 
@@ -340,34 +343,13 @@ def Newton(f, x0, max_iter=10, tol=10e-5):
             break
 
         p = newton_cg_step(loss_val, x)
-        x = x + p   # ou avec line search
+        x = (x + p).detach().requires_grad_(True)  
     return x
 
 def softmax(x, axis=0):
     x_max = np.max(x, axis=axis, keepdims=True)
     exp_x = np.exp(x - x_max)
     return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
-
-def solve_Newton(X_init, t, params, start_with_matrix=False, M=[[]]):
-    N_lignes = params["N"]
-    if start_with_matrix:
-        Q = torch.nn.Parameter(M.copy).requires_grad_(True)
-    else :
-        Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes)).requires_grad_(True)
-    P = torch.softmax(Q, dim=0)
-    for k in range(20):
-        loss_val = J(P)
-        grad = torch.autograd.grad(loss_val, x, create_graph=True)[0]
-
-        if torch.norm(grad) < 10e-5:
-            break
-
-        p = newton_cg_step(loss_val, x)
-        x = x + p   # ou avec line search
-    return x
-
-
-
 
 
 def J(p):
@@ -396,7 +378,6 @@ def hessian_approx(p, h):
                 - J_vec(v + h*ej)
                 + J_vec(v)
             ) / h**2
-
     return H
 
 
