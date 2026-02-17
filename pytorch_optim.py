@@ -53,6 +53,7 @@ def mise_a_jour_terme_source_vectorial(X, P, N_lignes, nb_colonnes, L, H, D, u, 
     K = u[0] * delta_t / delta_x
 
     X_new = X.clone()
+    X_temp = X.clone()
 
     for i in range(nb_colonnes):
         M[i, i] = 1 - 2*nu - K
@@ -60,16 +61,16 @@ def mise_a_jour_terme_source_vectorial(X, P, N_lignes, nb_colonnes, L, H, D, u, 
             M[i, i+1] = nu 
         if i>0:
             M[i, i-1] = nu + K
-    M[N_lignes-1, 0] = nu + K
+    M[N_lignes-1, 0] = nu 
     M[0, N_lignes-1] = nu - K
-    X_new[:, 0] = P@X_new[:, 0]
-    X_new = X_new@M
+    X_temp[:, 0] = P@X_temp[:, 0]
+    X_new = X_temp@M.T
 
     for i in range(N_lignes):
         I = i_s * np.exp(-eps * H / N_lignes * i)
         A = 1.0 / (k_d/k_r * tau * (sigma_H*I)**2 + tau*sigma_H*I + 1)
         taux_croiss = k_h * sigma_H * I * A
-        X_new[i, :] += delta_t*taux_croiss*X[i, :]
+        X_new[i, :] += delta_t*taux_croiss*X_temp[i, :]
     
     return X_new
 
