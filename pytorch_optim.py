@@ -45,8 +45,37 @@ def mise_a_jour_terme_source_torch(X, P, N_lignes, nb_colonnes, L, H, D, u, delt
         )
 
     return X_new
+def mise_a_jour_terme_source_vectorial(X, P, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H):
+    
+    M = torch.zeros((nb_colonnes, nb_colonnes))
+    delta_x = L/nb_colonnes
+    nu = D * delta_t / (delta_x * delta_x)
+    K = u[0] * delta_t / delta_x
 
-def modele_stochastique_torch(X, t, P, params):
+    X_new = X.clone()
+
+    for i in range(nb_colonnes):
+        M[i, i] = 1 - 2*nu - K
+        if i<nb_colonnes-1:
+            M[i, i+1] = nu 
+        if i>0:
+            M[i, i-1] = nu + K
+    M[N_lignes-1, 0] = nu + K
+    M[0, N_lignes-1] = nu - K
+    X_new[:, 0] = P@X_new[:, 0]
+    X_new = X_new@M
+
+    for i in range(N_lignes):
+        I = i_s * np.exp(-eps * H / N_lignes * i)
+        A = 1.0 / (k_d/k_r * tau * (sigma_H*I)**2 + tau*sigma_H*I + 1)
+        taux_croiss = k_h * sigma_H * I * A
+        X_new[i, :] += delta_t*taux_croiss*X[i, :]
+    
+    return X_new
+
+
+
+def modele_stochastique_torch(X, t, P, params, mise_a_jour=mise_a_jour_terme_source_torch):
     # --- Paramètres ---
     N_lignes = params["N"]
     nb_colonnes = params["nb_colonnes_default"]
@@ -75,12 +104,12 @@ def modele_stochastique_torch(X, t, P, params):
 
     # --- Boucle temporelle ---
     for _ in range(nb_iterations + 1):
-        X1 = mise_a_jour_terme_source_torch(X1, P, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
+        X1 = mise_a_jour(X1, P, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
 
     # --- Dernier pas fractionnaire ---
     if t != nb_iterations * delta_t:
         new_delta_t = t - nb_iterations * delta_t
-        X1 = mise_a_jour_terme_source_torch(X1, P, N_lignes, nb_colonnes, L, H, D, u, new_delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
+        X1 = mise_a_jour(X1, P, N_lignes, nb_colonnes, L, H, D, u, new_delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
 
     return X1
 
@@ -239,8 +268,7 @@ def solve_fast(
 
         # 2️⃣ appel à une version modifiée de l’objectif
         loss = -fonction_objectif_torch_fast(
-            X_init, t, N_lignes, nb_colonnes,
-            P, L, H, mu, u, CFL)
+            X_init, t, params)
 
         biomass_list.append(-loss.item())
 
