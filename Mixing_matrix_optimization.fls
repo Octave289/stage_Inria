@@ -182,6 +182,9 @@ INPUT C:\Users\octav\AppData\Local\Programs\MiKTeX\tex\latex\mathtools\mhsetup.s
 INPUT C:\Users\octav\AppData\Local\Programs\MiKTeX\tex\latex\mathtools\mhsetup.sty
 INPUT C:\Users\octav\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
 INPUT C:\Users\octav\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
+INPUT .\Mixing_matrix_optimization.aux
+INPUT .\Mixing_matrix_optimization.aux
+INPUT Mixing_matrix_optimization.aux
 OUTPUT Mixing_matrix_optimization.aux
 INPUT C:\Users\octav\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\octav\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii

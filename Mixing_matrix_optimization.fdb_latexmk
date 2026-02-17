@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1771254277.53777 "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" "Mixing_matrix_optimization.pdf" "Mixing_matrix_optimization" 1771254280.41705 2
+["pdflatex"] 1771338410.16625 "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" "Mixing_matrix_optimization.pdf" "Mixing_matrix_optimization" 1771338412.41531 2
   "C:/Users/octav/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1765190426 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/octav/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1000.pk" 1768209275 25420 3681a4d0cc8a4d8c3f26a3126c8e242f ""
   "C:/Users/octav/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1200.pk" 1763721389 31952 64d28f82427a09589e08036c6fd8a703 ""
@@ -167,11 +167,11 @@
   "C:/Users/octav/AppData/Local/Programs/MiKTeX/tex/latex/tools/calc.sty" 1700599895 10214 547fd4d29642cb7c80bf54b49d447f01 ""
   "C:/Users/octav/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
   "I en fonction de z.png" 1768300809 17070 7a3f1b7c538148762a605bf28227ec2c ""
-  "Mixing_matrix_optimization.aux" 1771254279 6630 c1bc1fff03351e0fff659dd47f55aa7a "pdflatex"
-  "Mixing_matrix_optimization.tex" 1771254270 41126 514068a0844ad8f22443df58f455e782 ""
+  "Mixing_matrix_optimization.aux" 1771338411 6627 db0012caa5573bd664d398150621c281 "pdflatex"
+  "Mixing_matrix_optimization.tex" 1771338406 42350 653fcc090d4c21842cf44709c8303373 ""
   "adam_steps_u=0.001.png" 1769035315 22756 4193fdd51f3fcca7f6adf512cb912121 ""
   "biomasses recherche matrice N=5.png" 1768816786 13969 46184d310c24e5dcbd53080b49cf5e5d ""
-  "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" 1771254270 41126 514068a0844ad8f22443df58f455e782 ""
+  "c:/Users/octav/Desktop/modélisation algues/Mixing_matrix_optimization.tex" 1771338406 42350 653fcc090d4c21842cf44709c8303373 ""
   "lr_finder_2.png" 1771232424 17218 4405b6a66afacc6f93644e7af8810e4f ""
   "masse_par_couche_N=3.png" 1770277531 23276 095bb7f84d46d23d2ccf3724baed7b56 ""
   "mu en fonction de I.png" 1768298027 17590 7d742dad2b95c0b58ed1dcd6de458bb4 ""

@@ -373,7 +373,7 @@ def Newton(f, x0, max_iter=10, tol=10e-5):
 
         p = newton_cg_step(loss_val, x)
         x = (x + p).detach().requires_grad_(True)  
-    return x
+    return x, loss_val
 
 def softmax(x, axis=0):
     x_max = np.max(x, axis=axis, keepdims=True)

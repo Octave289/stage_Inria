@@ -903,7 +903,28 @@ We can now begin the ADAM algorithm starting from this matrix and see if we obta
 
 The immediate problem we face is the algorithm complexity. With $T = 300\text{s}$ and a three layer pond, the solver takes about one hour to return the approximate optimal matrix. 
 
-\subsubsection{other optimizers}
+\subsubsection{Newton method}
+Let us try to use another optimizer, based on the Newton method with conjugate gradient.
+This method is a second-order optimization technique used to find a local minimizer of a twice-differentiable function $f : \mathbb{R}^n \to \mathbb{R}$. 
+At iteration $k$, the Newton direction $p_k$ is defined as the solution of the linear system
+\[
+\nabla^2 f(x_k) p_k = -\nabla f(x_k),
+\]
+where $\nabla f(x_k)$ is the gradient and $\nabla^2 f(x_k)$ is the Hessian matrix.
+
+For large-scale problems as ours, explicitly forming and inverting the Hessian matrix is computationally expensive. 
+Instead, the Newton system can be solved approximately using the Conjugate Gradient (CG) method. 
+The CG algorithm is particularly efficient when the Hessian is symmetric and positive definite, as it only requires matrix-vector products.
+
+In the Newton-CG method, at each iteration we apply the Conjugate Gradient algorithm to compute an approximate solution $p_k$ of the Newton system. 
+The iterate is then updated as
+\[
+x_{k+1} = x_k + \alpha_k p_k,
+\]
+where $\alpha_k$ is determined by a line search procedure.
+
+In our problem, with the same initial conditions than before, we end up with the following optimal matrix :
+
 
 \paragraph{Computational complexity.}
 
