@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  12 FEB 2026 17:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  16 FEB 2026 16:04
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -420,7 +420,8 @@ Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count308
 \l__pdf_internal_box=\box67
-) (Mixing_matrix_optimization.aux)
+)
+No file Mixing_matrix_optimization.aux.
 \openout1 = `Mixing_matrix_optimization.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 20.
@@ -440,7 +441,7 @@ LaTeX Font Info:    ... okay on input line 20.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
- (C:\Users\octav\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
+(C:\Users\octav\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count309
 \scratchdimen=\dimen285
@@ -756,22 +757,22 @@ File: biomasses recherche matrice N=5.png Graphic file (type png)
 Package pdftex.def Info: biomasses recherche matrice N=5.png  used on input line 725.
 (pdftex.def)             Requested size: 283.22162pt x 204.13995pt.
  [13 <./biomasses recherche matrice N=5.png>] [14]
-<learning_rate_finder.png, id=82, 422.7795pt x 309.3156pt>
-File: learning_rate_finder.png Graphic file (type png)
-<use learning_rate_finder.png>
-Package pdftex.def Info: learning_rate_finder.png  used on input line 857.
-(pdftex.def)             Requested size: 424.82523pt x 310.82988pt.
- [15]
-<adam_steps_u=0.001.png, id=86, 414.8298pt x 309.3156pt>
+<lr_finder_2.png, id=82, 414.1071pt x 298.4751pt>
+File: lr_finder_2.png Graphic file (type png)
+<use lr_finder_2.png>
+Package pdftex.def Info: lr_finder_2.png  used on input line 857.
+(pdftex.def)             Requested size: 424.82523pt x 306.20766pt.
+ [15 <./lr_finder_2.png>]
+<adam_steps_u=0.001.png, id=87, 414.8298pt x 309.3156pt>
 File: adam_steps_u=0.001.png Graphic file (type png)
 <use adam_steps_u=0.001.png>
 Package pdftex.def Info: adam_steps_u=0.001.png  used on input line 869.
 (pdftex.def)             Requested size: 472.03123pt x 351.97682pt.
- [16 <./learning_rate_finder.png>] [17 <./adam_steps_u=0.001.png>]
-LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 937.
+ [16 <./adam_steps_u=0.001.png>]
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 938.
  (C:\Users\octav\AppData\Local\Programs\MiKTeX\tex/latex/base\t1cmtt.fd
 File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
-) [18] (Mixing_matrix_optimization.aux)
+) [17] [18] (Mixing_matrix_optimization.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -785,15 +786,15 @@ LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 17353 strings out of 474485
- 344662 string characters out of 5743733
+ 17350 strings out of 474485
+ 344452 string characters out of 5743733
  1944542 words of memory out of 5000000
- 39348 multiletter control sequences out of 15000+600000
+ 39347 multiletter control sequences out of 15000+600000
  574363 words of font info for 78 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,10n,107p,801b,699s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1000.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1000.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm0700.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm0900.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1000.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1000.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1000.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\octav\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1728.pk><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/octav/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm7.pfb>
-Output written on Mixing_matrix_optimization.pdf (18 pages, 410355 bytes).
+Output written on Mixing_matrix_optimization.pdf (18 pages, 406815 bytes).
 PDF statistics:
  473 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

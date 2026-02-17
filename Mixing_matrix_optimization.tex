@@ -854,11 +854,11 @@ The resulting curve, representing the loss as a function of the learning rate, i
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{learning_rate_finder.png}
+\includegraphics[width=0.9\textwidth]{lr_finder_2.png}
 \end{figure}
 \subsubsection{learning rate finder, loss vs lr}
 
-Contrary to the classical behaviour observed in many deep learning applications, the loss does not exhibit an instability or divergence for large learning rates, but instead decreases monotonically as the learning rate increases. 
+Contrary to the classical behaviour observed in many deep learning applications, the loss does not exhibit an instability or divergence for large learning rates, but instead increases monotonicallyincreases. 
 This behaviour can be explained by the specific structure of the problem: the number of optimized parameters is small, the optimization is performed through a softmax parametrization which enforces boundedness and normalization, and the Adam optimizer adaptively rescales the update step, preventing numerical instability. 
 As a consequence, no critical learning rate leading to divergence is observed. We therefore select a learning rate corresponding to the largest value before the curve flattens ($lr = 0.1$), which provides fast convergence while remaining numerically stable.
 
@@ -903,6 +903,7 @@ We can now begin the ADAM algorithm starting from this matrix and see if we obta
 
 The immediate problem we face is the algorithm complexity. With $T = 300\text{s}$ and a three layer pond, the solver takes about one hour to return the approximate optimal matrix. 
 
+\subsubsection{other optimizers}
 
 \paragraph{Computational complexity.}
 
