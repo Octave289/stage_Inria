@@ -335,7 +335,7 @@ def newton_cg_step(loss, x, tol=1e-5, max_iter=20):
     return p
 
 
-def Newton(f, x0, max_iter=10, tol=10e-5):
+def Newton(f, x0, max_iter=20, tol=10e-5):
     x = x0
     for k in range(max_iter):
         loss_val = f(x)
