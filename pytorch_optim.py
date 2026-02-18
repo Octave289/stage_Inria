@@ -61,8 +61,8 @@ def mise_a_jour_terme_source_vectorial(X, P, N_lignes, nb_colonnes, L, H, D, u, 
             M[i, i+1] = nu 
         if i>0:
             M[i, i-1] = nu + K
-    M[N_lignes-1, 0] = nu 
-    M[0, N_lignes-1] = nu - K
+    M[nb_colonnes-1, 0] = nu 
+    M[0, nb_colonnes-1] = nu + K
     X_temp[:, 0] = P@X_temp[:, 0]
     X_new = X_temp@M.T
 
@@ -133,7 +133,7 @@ def X_ini_uniform_torch(N_lignes, nb_colonnes, value=1.0):
     return X
 
 def fonction_objectif_torch(X0, t, p, params):
-    X1 = modele_stochastique_torch(X0, t, p, params)
+    X1 = modele_stochastique_torch(X0, t, p, params, mise_a_jour_terme_source_vectorial)
     return torch.sum(X1)
 
 def fonction_objectif_torch_fast(
