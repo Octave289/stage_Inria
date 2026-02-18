@@ -2,6 +2,7 @@
 
 import numpy as np
 import torch
+torch.autograd.set_detect_anomaly(True)
 import modele 
 
 #Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
@@ -63,14 +64,17 @@ def mise_a_jour_terme_source_vectorial(X, P, N_lignes, nb_colonnes, L, H, D, u, 
             M[i, i-1] = nu + K
     M[nb_colonnes-1, 0] = nu 
     M[0, nb_colonnes-1] = nu + K
-    X_temp[:, 0] = P@X_temp[:, 0]
+    X_temp_col0 = P @ X_temp[:, 0]   # nouveau tensor
+    X_temp = X_temp.clone()           # clone pour casser la vue
+    X_temp[:, 0] = X_temp_col0
+
     X_new = X_temp@M.T
 
     for i in range(N_lignes):
         I = i_s * np.exp(-eps * H / N_lignes * i)
         A = 1.0 / (k_d/k_r * tau * (sigma_H*I)**2 + tau*sigma_H*I + 1)
         taux_croiss = k_h * sigma_H * I * A
-        X_new[i, :] += delta_t*taux_croiss*X_temp[i, :]
+        X_new[i, :] = X_new[i, :] + delta_t*taux_croiss*X_temp[i, :]
     
     return X_new
 
@@ -239,16 +243,14 @@ def solve(X_init, t, params, start_with_matrix=False, M=[[]]):
         Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
     optimizer = torch.optim.Adam([Q], lr=1e-1)
     biomass_list = []
-    for it in range(150):
+    for it in range(35):
         optimizer.zero_grad()
         P = torch.softmax(Q, dim=0)
         loss = -fonction_objectif_torch(X_init, t, P, params)
         biomass_list.append(-loss.item())
         loss.backward()
         optimizer.step()
-
-        if it % 50 == 0:
-            print(it, -loss.item())
+        print(it, -loss.item())
     return P, biomass_list
 
 def solve_fast(
