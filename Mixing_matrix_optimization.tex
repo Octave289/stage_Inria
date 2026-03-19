@@ -1,5 +1,4 @@
 \documentclass{article}
-
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage[utf8]{inputenc}
@@ -446,8 +445,8 @@ This additional term modifies the Courant--Friedrichs--Lewy (CFL) condition and,
 \subsection{introduction of a biomass source term}
 
 In this report, we present first numerical results illustrating the total biomass in the basin after a growth period of $T = 100\,\mathrm{s}$. 
-According to \cite{Liu-Di Lu, 2021}, the algae follow the Han growth model, which is of Haldane if the dynamic of the open state is at its steady state.
-The light intensity follows a Beer-lambert law \cite{Beer-Lambert}:
+According to \cite{1}, the algae follow the Han growth model, which is of Haldane if the dynamic of the open state is at its steady state.
+The light intensity follows a Beer-lambert law \cite{2}:
 \[ I = I_s e^{-\epsilon z}\] 
 With $I_s = 1500 \ \mathrm{m^{-2}\,\mu mol\,s^{-1}}$
 \begin{figure}[H]
@@ -533,14 +532,6 @@ And
     \label{fig:global}
 \end{figure}
 
-
-    \caption{%
-    (a) $\mu\,(d^{-1})$ as a function of $z$ ;
-    (b) $\mu\,(d^{-1})$ as a function of $I$ ;
-    (c) $I$ as a function of $z$
-    }
-    \label{fig:mu_I_z}
-\end{figure}
 
 The simulations are performed for a single layer, and therefore without any mixing effects. 
 The only varying parameter is the water velocity $u$. For a discretization of 500 points, we impose a uniform initial concentration and an initial total biomass of 50 Kg.
@@ -642,8 +633,10 @@ The optimal mixing matrix is:
 
 This matrix induces a permutation of layers which induces the allocation of layer 1 in position 2, corresponding to the largest growth coefficient.
 Here is a graphic representing the total algae mass in each layer as a function of time, with the latter permutation matrix.
-\begin{figure}
-    \includegraphics[0.5\textwidth]{masse_par_couche_N=3.png}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{masse_par_couche_N=3.png}
     \caption{biomass in each layer through time}
     \label{fig:t0}
 \end{figure}
@@ -702,7 +695,7 @@ Layer 5 & $2.2153 \times 10^{-5}$ & 37.83 \\
 \end{tabular}
 \end{table}
 \subsubsection{Configuration 1: biomass initially in layer 1}
-After a period T= 3600 $s$ of growth, the total biomass obtained is:
+After a period T= 300 $s$ of growth, the total biomass obtained is:
 \[
 B_{\text{tot}} = 50.390 \quad \mathrm{Kg}
 \]
@@ -720,7 +713,7 @@ Optimal mixing matrix:
 \]
 Here again, let us represent the successive biomass values associated to the tested permutation matrices :
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.6\textwidth]{biomasses recherche matrice N=5.png}
 \end{figure}
@@ -808,28 +801,13 @@ Furthermore, to process the matrix constraints (non negative coefficients and ev
 
 The objective function remains the same.
 
-\subsection{initial test}
-Let us first verify if the new solver is functional. In order to do so, let us consider a three layers basin, and an objective function which mixes these layers with respect to the matrix $P = \text{softmax}(Q)$ and returns the total biomass, after a pre-determined growing period. 
-The growth coefficients will be arbitrarely set to 1 for layer 1, 2 for layer 2 and 3 for layer 3. Therefore, with an initial basin in which the total biomass is concentrated in layer 1, an optimal matrix should reallocate it in layer 3. 
-Let us consider the results.
-
-The optimal mixing matrix is:
-\[
-\mathbf{P} =
-\begin{pmatrix}
-0.003 & 0.50 & 0.26 \\
-0.007& 0.30 & 0.10\\
-0.99 & 0.20 & 0.64
-\end{pmatrix}
-\]
-
-The first layer is indeed moved to layer 3 by 99 percent. 
-
 \subsection{Optimal stochastic matrix}
 
 
 Let us now use the original objective function, i.e the final biomass after a given growth period $T$. 
-As before, the growth time remains $T = 300 s$ and the initial conditions are that the total biomass is in layer 1.
+As before, the growth time remains $T = 300 s$ and the initial conditions are that the total biomass is in layer 1. The algorithm complexity is a linear function of the number of layers.
+Therefore, it allows us to divide the water pond in 10 layers. 
+
 \subsubsection{optimizer parameters}
 
 The Adam optimizer (Adaptive Moment Estimation) combines momentum-based gradient descent with per-parameter adaptive learning rates. 
@@ -849,30 +827,127 @@ The parameter update is then given by
 \]
 where $\alpha$ is the global learning rate, while $\beta_1$ and $\beta_2$ control the exponential decay rates of the first and second moments, respectively, governing the trade-off between stability and responsiveness of the optimization process.
 
-In order to choose an appropriate learning rate for the Adam optimization algorithm, we performed a learning rate finder experiment. The principle consists in running a single optimization trajectory while progressively increasing the learning rate and recording the corresponding value of the loss. 
-The resulting curve, representing the loss as a function of the learning rate, is shown here after.
+In order to choose an appropriate learning rate for the Adam optimization algorithm, we performed a learning rate finder experiment. The principle consists in lauching the optimization with different $\alpha$ values, and check which one converges the quickest. 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{lr_finder_2.png}
+    \begin{subfigure}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.01.png}
+        \subcaption*{(a)}
+        \label{fig:lr_0.01}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.1.png}
+        \subcaption*{(b)}
+        \label{fig:lr_0.1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.9.png}
+        \subcaption*{(c)}
+        \label{fig:lr_0.9}
+    \end{subfigure}
+    \caption{
+    (a) $\alpha = 0.01$;
+    (b) $\alpha = 0.1$ ;
+    (c) $\alpha = 0.9$
+    }
+    \label{fig:global}
 \end{figure}
-\subsubsection{learning rate finder, loss vs lr}
 
-Contrary to the classical behaviour observed in many deep learning applications, the loss does not exhibit an instability or divergence for large learning rates, but instead increases monotonicallyincreases. 
-This behaviour can be explained by the specific structure of the problem: the number of optimized parameters is small, the optimization is performed through a softmax parametrization which enforces boundedness and normalization, and the Adam optimizer adaptively rescales the update step, preventing numerical instability. 
-As a consequence, no critical learning rate leading to divergence is observed. We therefore select a learning rate corresponding to the largest value before the curve flattens ($lr = 0.1$), which provides fast convergence while remaining numerically stable.
+It is clear that the best learning rate is $\alpha = 0.9$. It reaches a plateau after about 12 iterations. Based on this observation, we can arbitrarely bond the number of iterations by 12.
 
-Once the learning rate is fixed, we analyze the convergence of the optimization by plotting the loss as a function of the iteration number. 
+For 10 layers, the approximate optimal matrix is the following.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{adam_steps_u=0.001.png}
-\end{figure}
-\subsubsection{loss vs iterations}
-The curve exhibits a clear plateau after a given number of iterations, indicating that further optimization steps do not significantly improve the objective value. 
-Based on this observation, the optimization is stopped at this iteration count, which provides a good trade-off between computational cost and convergence accuracy.
+\[
+\begin{pmatrix}
+0.000 & 0.003 & 0.010 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.001 & 0.004 \\
+0.000 & 0.011 & 0.001 & 0.020 & 0.000 & 0.000 & 0.000 & 0.007 & 0.004 & 0.006 \\
+0.000 & 0.009 & 0.008 & 0.003 & 0.000 & 0.000 & 0.000 & 0.005 & 0.004 & 0.004 \\
+0.001 & 0.394 & 0.373 & 0.080 & 0.000 & 0.000 & 0.002 & 0.112 & 0.151 & 0.082 \\
+0.003 & 0.285 & 0.251 & 0.072 & 0.012 & 0.000 & 0.504 & 0.073 & 0.193 & 0.051 \\
+0.992 & 0.095 & 0.076 & 0.443 & 0.985 & 0.999 & 0.345 & 0.511 & 0.331 & 0.599 \\
+0.003 & 0.087 & 0.140 & 0.371 & 0.001 & 0.000 & 0.142 & 0.283 & 0.268 & 0.203 \\
+0.000 & 0.103 & 0.131 & 0.005 & 0.001 & 0.000 & 0.005 & 0.001 & 0.041 & 0.045 \\
+0.000 & 0.007 & 0.005 & 0.006 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.002 \\
+0.000 & 0.007 & 0.006 & 0.000 & 0.000 & 0.000 & 0.000 & 0.005 & 0.005 & 0.002
+\end{pmatrix}
+\]
 
-With an initial pond in which the biomass is only in the first layer, the solver returns the following matrix :
+As seen before, the line 6 has the largest coefficients because layer 6 has the highest growth coefficient. The optimal matrix allocates most of the biomass in this layer.
+But stochastic matrices aren't physically relevant. Indeed, in terms of water volume, a real-life paddle wheel should allocate to each layer exactly the volume of one layer. 
+Such a wheel could only be represented by a bistochastic matrix.
+
+\section{Optimal bistochastic matrix}
+
+Using the same solver than before, we only add a penalty to the objective function to impose that the sum on each line of the mixing matrix should equal 1.
+After lauching the program for a $10$ layers pond, we end up with the following matrix.
+
+\[
+\begin{bmatrix}
+0.1727 & 0.0401 & 0.1280 & 0.1118 & 0.0686 & 0.0839 & 0.0447 & 0.2331 & 0.0285 & 0.0885 \\
+0.0422 & 0.2675 & 0.0660 & 0.1765 & 0.0297 & 0.0281 & 0.1194 & 0.1010 & 0.0907 & 0.0790 \\
+0.2268 & 0.0297 & 0.1286 & 0.0654 & 0.0687 & 0.0290 & 0.2182 & 0.0791 & 0.1469 & 0.0075 \\
+0.1335 & 0.1178 & 0.0531 & 0.0894 & 0.1766 & 0.0053 & 0.0866 & 0.0164 & 0.0864 & 0.2348 \\
+0.2559 & 0.0255 & 0.3115 & 0.0160 & 0.0122 & 0.0688 & 0.0067 & 0.1059 & 0.1850 & 0.0123 \\
+0.0238 & 0.3348 & 0.0341 & 0.0567 & 0.2197 & 0.0715 & 0.0415 & 0.0387 & 0.1417 & 0.0375 \\
+0.0467 & 0.0217 & 0.0830 & 0.3417 & 0.0783 & 0.0183 & 0.2618 & 0.0856 & 0.0249 & 0.0380 \\
+0.0410 & 0.0510 & 0.0688 & 0.0451 & 0.2185 & 0.1392 & 0.0301 & 0.2752 & 0.1097 & 0.0213 \\
+0.0356 & 0.0181 & 0.0586 & 0.0700 & 0.1100 & 0.5202 & 0.0761 & 0.0173 & 0.0743 & 0.0198 \\
+0.0218 & 0.0936 & 0.0683 & 0.0274 & 0.0177 & 0.0357 & 0.1148 & 0.0476 & 0.1119 & 0.4613
+\end{bmatrix}
+\]
+
+This mixing matrix corresponds to a final biomass (after $T = 300s$ of growth) of $B_{\text{tot}} = 50.369 \quad \mathrm{Kg}$.
+
+Let us try to launch the algorithm with an initial permutation matrix. We notice that it converges with a similar pattern for each matrix. 
+For example, starting from the identity, the algorithm returns the following matrix.
+
+\[
+\begin{pmatrix}
+0.2263 & 0.0860 & 0.0861 & 0.0859 & 0.0859 & 0.0860 & 0.0859 & 0.0859 & 0.0861 & 0.0859 \\
+0.0841 & 0.2321 & 0.0856 & 0.0855 & 0.0855 & 0.0855 & 0.0855 & 0.0855 & 0.0855 & 0.0854 \\
+0.0867 & 0.0863 & 0.2309 & 0.0850 & 0.0850 & 0.0850 & 0.0850 & 0.0850 & 0.0847 & 0.0863 \\
+0.0865 & 0.0850 & 0.0853 & 0.2317 & 0.0853 & 0.0853 & 0.0853 & 0.0852 & 0.0852 & 0.0850 \\
+0.0873 & 0.0850 & 0.0852 & 0.0852 & 0.2316 & 0.0852 & 0.0852 & 0.0852 & 0.0851 & 0.0850 \\
+0.0875 & 0.0849 & 0.0852 & 0.0852 & 0.0852 & 0.2315 & 0.0852 & 0.0851 & 0.0851 & 0.0849 \\
+0.0870 & 0.0850 & 0.0852 & 0.0852 & 0.0852 & 0.0852 & 0.2316 & 0.0852 & 0.0851 & 0.0850 \\
+0.0860 & 0.0851 & 0.0853 & 0.0853 & 0.0853 & 0.0853 & 0.0853 & 0.2319 & 0.0852 & 0.0850 \\
+0.0849 & 0.0853 & 0.0855 & 0.0854 & 0.0854 & 0.0854 & 0.0854 & 0.0854 & 0.2322 & 0.0853 \\
+0.0835 & 0.0854 & 0.0856 & 0.0855 & 0.0856 & 0.0856 & 0.0856 & 0.0855 & 0.0856 & 0.2322
+\end{pmatrix}
+\]
+
+wich is an affine translation of the identity. But the final biomass is lower than the one associated with the first matrix : starting the gradient descent from the identity brings us to a local maximum of $B_{\text{tot}} = 50.357 \quad \mathrm{Kg}$.
+There seems to be a local maximum of the objective function "near" each permutation matrix. As observed in simulations, launching the gradient descent with a permutation matrix $P$ will converge to a bistochastic matrix close to :
+\[ 0.086*E + 0.14*P\] where $E = (1)_{1\leq i, j \leq I}$.
+
+
+
+\section{research perspectives and next steps in the work plan}
+As an immediate next step, we can compute this algorithm starting from different types of bistochastic matrices, to get a better idea of the surface generated by the function on the set of bistochastic matrices. Furthermore, we could try to find a way to associate a matrix to a real-life paddle wheel to try and compare the optimization results to reality.
+
+\section{annexes}
+\subsection{initial test}
+To check if the new solver is functional. In order to do so, let us consider a three layers basin, and an objective function which mixes these layers with respect to the matrix $P = \text{softmax}(Q)$ and returns the total biomass, after a pre-determined growing period. 
+The growth coefficients will be arbitrarely set to 1 for layer 1, 2 for layer 2 and 3 for layer 3. Therefore, with an initial basin in which the total biomass is concentrated in layer 1, an optimal matrix should reallocate it in layer 3. 
+Let us consider the results.
+
+The optimal mixing matrix is:
+\[
+\mathbf{P} =
+\begin{pmatrix}
+0.003 & 0.50 & 0.26 \\
+0.007& 0.30 & 0.10\\
+0.99 & 0.20 & 0.64
+\end{pmatrix}
+\]
+
+The first layer is indeed moved to layer 3 by 99 percent. 
+
+\subsection{3 layers comparison test}
+With an initial pond of 3 layers, in which the biomass is only in the first layer, the solver returns the following matrix :
 \[
 \begin{pmatrix}
 4.126\times 10^{-5} & 3.704\times 10^{-4} & 2.707\times 10^{-4} \\
@@ -900,10 +975,7 @@ We can now begin the ADAM algorithm starting from this matrix and see if we obta
 5.955 \times 10^{-3} & 2.301 \times 10^{-3} & 5.411 \times 10^{-2}
 \end{pmatrix}
 \]
-
-The immediate problem we face is the algorithm complexity. With $T = 300\text{s}$ and a three layer pond, the solver takes about one hour to return the approximate optimal matrix. 
-
-\subsubsection{Newton method}
+\subsection{Newton method}
 Let us try to use another optimizer, based on the Newton method with conjugate gradient.
 This method is a second-order optimization technique used to find a local minimizer of a twice-differentiable function $f : \mathbb{R}^n \to \mathbb{R}$. 
 At iteration $k$, the Newton direction $p_k$ is defined as the solution of the linear system
@@ -922,11 +994,7 @@ The iterate is then updated as
 x_{k+1} = x_k + \alpha_k p_k,
 \]
 where $\alpha_k$ is determined by a line search procedure.
-
-In our problem, with the same initial conditions than before, we end up with the following optimal matrix :
-
-
-\paragraph{Computational complexity.}
+\subsection{Computational complexity.}
 
 We analyze the computational complexity of the optimization procedure by first estimating the cost of a single evaluation of the objective function. The time step of the numerical scheme is given by
 \[
@@ -961,21 +1029,16 @@ Finally, the full optimization procedure consists of $K$ iterations of the Adam 
 \mathcal{O}\!\left( K\,\frac{a\,N\,n^2\,T}{L} \right).
 \]
 
-\section{research perspectives and next steps in the work plan}
-As an immediate next step, we can compute this algorithm with a larger number of layers, and a longer growth period. 
-But as the latter algorithm takes a long time to compute, this will rapidly take several days to return a result. A new field to explore could be an estimation of the algorithm complexity and a way to tackle it. \\
-Furthermore, we could also look for other optimization methods (the Newton method for example). 
-
 \begin{thebibliography}{9}
 
-\bibitem{Liu-Di Lu, 2021}
+\bibitem{1}
 Liu-Di Lu,
 \textit{Lagrangian Approaches for Modelling
 and Optimization of
 Hydrodynamic-Photosynthesis
 Coupling},
 Sorbonne Université, LJLL, 2021
-\bibitem{Beer-Lambert}
+\bibitem{2}
 Oxford reference
 \textit{Beer-Lambert Law}
 \end{thebibliography}

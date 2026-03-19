@@ -235,15 +235,15 @@ def test_gradient(X_init, t, params):
 
 ##### ADAM method
 
-def solve(X_init, t, params, start_with_matrix=False, M=[[]]):
+def solve(X_init, t, params, l_r=0.9, start_with_matrix=False, M=[[]]):
     N_lignes = params["N"]
     if start_with_matrix:
         Q = torch.nn.Parameter(torch.tensor(M))
     else:
         Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
-    optimizer = torch.optim.Adam([Q], lr=1e-1)
+    optimizer = torch.optim.Adam([Q], lr=l_r)
     biomass_list = []
-    for it in range(35):
+    for it in range(15):
         optimizer.zero_grad()
         P = torch.softmax(Q, dim=0)
         loss = -fonction_objectif_torch(X_init, t, P, params)
@@ -251,6 +251,28 @@ def solve(X_init, t, params, start_with_matrix=False, M=[[]]):
         loss.backward()
         optimizer.step()
         print(it, -loss.item())
+    return P, biomass_list
+
+def solve_bistochastique(X_init, t, params, max_iter=30, penalty_factor=1000, lr=0.2, start_with_matrix=False, M=torch.eye(10)):
+    N_lignes = params["N"]
+    if start_with_matrix:
+        Q = torch.nn.Parameter(M)
+    else:
+        Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
+    optimizer = torch.optim.Adam([Q], lr=lr, maximize=True)
+    biomass_list = []
+    for it in range(max_iter):
+        optimizer.zero_grad()
+        P = torch.softmax(Q, dim=0)
+        penalties = 0
+        row_sums = P.sum(dim=1)
+        penalties = ((row_sums - 1)**2).sum()
+        loss = fonction_objectif_torch(X_init, t, P, params) - penalty_factor*penalties
+        biomass_list.append(loss + penalty_factor*penalties)
+        loss.backward()
+        optimizer.step()
+        print("obj:", loss + penalty_factor*penalties,
+      "pen:", penalties)
     return P, biomass_list
 
 def solve_fast(
