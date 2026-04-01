@@ -4,6 +4,7 @@ import numpy as np
 import torch
 torch.autograd.set_detect_anomaly(True)
 import modele 
+from scipy.optimize import minimize
 
 #Q = torch.nn.Parameter(torch.randn(N_lignes, N_lignes))
 #P = torch.softmax(Q, dim=0)
@@ -268,13 +269,59 @@ def solve_bistochastique(X_init, t, params, max_iter=30, penalty_factor=1000, lr
         row_sums = P.sum(dim=1)
         penalties = ((row_sums - 1)**2).sum()
         loss = fonction_objectif_torch(X_init, t, P, params) - penalty_factor*penalties
+        print(P)
+        print("obj:", loss + penalty_factor*penalties,
+      "pen:", penalties)
         biomass_list.append(loss + penalty_factor*penalties)
         loss.backward()
         optimizer.step()
-        print("obj:", loss + penalty_factor*penalties,
-      "pen:", penalties)
     return P, biomass_list
 
+def inverse_softmax(M): #M de permutation
+    M_ = M
+    for i in range(len(M)):
+        for j in range(len(M)):
+            if M[i][j] == 0. :
+                M_[i][j] = -10.
+            if M[i][j] == 1. :
+                M[i][j] = 0.
+    return M_
+
+
+def fonction_objectif_optimize_test(X_init, t, p_list, params):
+        N = params["N"]
+        p = vector_to_matrix(p_list, N)
+
+        X = modele.modèle_stochastique(X_init, t, p, params, "advection_diffusion_terme_source",
+                                False, None, None, None, None)
+        masse_totale_algues = np.sum(X)
+        print(masse_totale_algues)
+        return -masse_totale_algues
+
+def solve_optimize(X_init, t, params, p0): 
+
+    def fonction_objectif_optimize(p_list):
+        N = params["N"]
+        p = vector_to_matrix(p_list, N)
+
+        X = modele.modèle_stochastique(X_init, t, p, params, "advection_diffusion_terme_source",
+                                False, None, None, None, None)
+        masse_totale_algues = np.sum(X)
+        print(masse_totale_algues)
+        return -masse_totale_algues
+    
+    constraints = []
+    N = params["N"]
+    for i in range(N):
+        constraints.append({'type': 'eq', 'fun' : lambda x, i=i: np.sum(x[N*i:N*(i+1)]) - 1})
+        for j in range(N):
+            constraints.append({'type': 'ineq', 'fun' : lambda x, i=i, j=j: x[N*i + j]})
+    for j in range(N-1):
+        constraints.append({'type': 'eq', 'fun' : lambda x, j=j: np.sum(x[N*i + j] for i in range(N)) - 1})
+    
+
+    return minimize(fonction_objectif_optimize, p0, constraints=constraints)
+    
 def solve_fast(
     X_init, t, N_lignes, nb_colonnes, L, H, mu, u, CFL,
     n_iter=150,

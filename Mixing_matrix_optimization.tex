@@ -560,79 +560,192 @@ It seems, that the biomass grows less as the current increases. One must take in
 This follows from the upwind scheme CFL condition. 
 
 
-\section{Firt Optimization of the Mixing Matrix : The permutation case}
+\section{Discrete Optimization over Permutation Matrices}
 
-\subsection{General Principle of the Algorithm}
+\subsection{Motivation}
+Before addressing the general optimization problem over stochastic or bistochastic matrices, 
+we first restrict the admissible set to permutation matrices.
 
-The objective of the algorithm is to optimize a mixing matrix applied to a discretized basin,
-in order to maximize the total biomass produced by the system.
+This restriction is motivated by both computational and physical considerations.
+From a computational perspective, the finite cardinality of the set of permutation matrices 
+allows for exhaustive search for small system sizes. 
+From a physical point of view, permutation matrices correspond to deterministic transport 
+of biomass between layers, as opposed to diffusive mixing. 
 
-For a given initial configuration, a candidate mixing matrix is repeatedly applied to the system.
-The temporal evolution of the basin is simulated with a constant time step, for a given period $T$.
-The total biomass is then evaluated.
+\subsection{Problem Definition}
 
-The algorithm explores different admissible mixing matrices (among every existing permutation matrices) and retains the one
-that maximizes the final total biomass.
+The objective of the algorithm is to optimize a mixing matrix $P$ applied to a discretized basin,
+in order to maximize the total biomass produced by the system. In this section, we restrict $P$ to the set of permutation matrices:
+\[
+\mathcal{P}_N = \{ P \in \{0,1\}^{N \times N} \mid P \mathbf{1} = \mathbf{1}, \; P^\top \mathbf{1} = \mathbf{1} \}.
+\]
 
-\subsection{Tested Initial Configurations}
+Given an initial biomass distribution $B(0)$, the system is evolved over a fixed time horizon $T$ 
+using a time-discretized dynamical model (to be detailed in Section~\ref{sec:model}). 
+The objective function is defined as the total biomass at final time:
+\[
+J(P) = B_{\text{tot}}(T).
+\]
 
-In this study, the basin consists of three vertical layers.
-The initial conditions are constructed by placing all the initial biomass (50 Kg) in a single layer,
-while the other layers start with zero biomass. 
-Three configurations are therefore considered, corresponding to the successive activation of each layer. The idea is to choose the mixing matrix which induces a maximal biomass after an hour of growth. 
-We will set the current speed value $u$ to 0.3 $\mathrm{m\, s^{-1}}$. It is a rather small value, but as the CFL depends on it, a smaller speed value leads to a shorter computing time. 
-300 seconds of growth therefore correspond to approximately 20 laps.
+The optimization problem reads:
+\[
+\max_{P \in \mathcal{P}_N} J(P).
+\]
 
-\subsection{Optimization Results}
+\subsection{Exhaustive Search Algorithm}
 
-For each initial configuration, the optimization algorithm converges to a matrix
-that maximizes the final total biomass with T = 300 s.
+For small values of $N$, the optimization problem can be solved by exhaustive enumeration 
+of all permutation matrices.
 
-\subsubsection{Comparative Analysis}
+The number of such matrices is $N!$, which rapidly becomes computationally prohibitive 
+as $N$ increases. In practice, exhaustive search is limited to:
+\[
+N \leq \text{7}.
+\]
 
-The optimization results show that the optimal mixing matrix depends strongly on the initial configuration of the basin.
-When biomass is localized in an inherently favorable layer (with the highest growth rate),
-keepig each layer unchanged is optimal (no mixing).
-Conversely, in less favorable configurations,
-vertical mixing allows biomass to be redistributed to more productive layers. We will see that the optimal matrices allocate biomass to the last layer (the deepest one).
-Indeed, as $\mu = A\, I\, k_h\, \sigma_H$, the $\mu$ values of each layer are the following :
+The algorithm proceeds as follows:
+\begin{enumerate}
+    \item Generate all permutation matrices $P \in \mathcal{P}_N$;
+    \item For each $P$, simulate the system dynamics up to time $T$;
+    \item Compute the objective value $J(P)$;
+    \item Select the matrix maximizing $J$.
+\end{enumerate}
+
+\subsection{Tested Configurations}
+
+The total initial biomass is fixed:
+\[
+B_{\text{tot}}(0) = \text{50 Kg}.
+\]
+The growth time is fixed to:
+\[
+T = \text{[TO COMPLETE]},
+\]
+and the flow velocity is set to:
+\[
+u = \text{0.1} \mathrm{m\, s^{-1}}
+\]
+
+300 seconds of growth therefore correspond to approximately 6 laps.
+
+To assess the influence of initial conditions, several configurations are considered :
+
+\begin{itemize}
+\item biomass entirely localized in a single layer, while all other layers are initialized with zero biomass.
+This leads to $N$ distinct initial configurations.
+\item Uniform distribution of the biomass.
+\end{itemize}
+
+\subsection{Results for Small Systems}
+
+\subsubsection{Case $N = 3$}
+
+The growth rates associated with each layer are given in Table~\ref{tab:mu_N3}.
 
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
-\textbf{Layer} & \textbf{$\mu$ (s$^{-1}$)} & \textbf{I} ($\mu$\text{mol} $m^{-2} s^{-1}$)\\
+\textbf{Layer} & \textbf{$\mu$ (s$^{-1}$)} & \textbf{Light intensity} \\
 \hline
 Layer 1 & $1.4198 \times 10^{-5}$ & 1500 \\
 Layer 2 & $3.0538 \times 10^{-5}$ & 323.72 \\
 Layer 3 & $2.8777 \times 10^{-5}$ & 69.86 \\
 \hline
 \end{tabular}
-\caption{Growth rates $\mu$ for each initial layer configuration}
-\label{tab:mu_layers}
+\caption{Growth rates and light intensities for $N=3$}
+\label{tab:mu_N3}
 \end{table}
 
-Therefore the last layer has the biggest growth rate.
+For each initial condition, the optimal permutation matrix is determined.
+The results are summarized below.
 
-\subsubsection{Configuration 1: biomass initially in layer 1}
+\begin{itemize}
+    \item Configuration 1 (biomass initially in layer \#1):\\
+        Optimal matrix:
+        \[
+        \mathbf{P}_1 =
+        \begin{pmatrix}
+        0 & 0 & 1 \\
+        1 & 0 & 0 \\
+        0 & 1 & 0
+        \end{pmatrix}
+        \]
+        Final biomass:
+        \[
+        B_{\text{tot}} = 50.369 \quad \mathrm{Kg}
+        \]
+        This matrix induces a permutation of layers which induces the allocation of layer 1 in position 2.
 
-The maximal total biomass obtained is:
-\[
-B_{\text{tot}} = 50.301 \quad \mathrm{Kg}
-\]
+    \item Configuration 2 (biomass initially in layer \#2): \\
+        Optimal matrix:
+        \[
+        \mathbf{P}_2 =
+        \begin{pmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+        \end{pmatrix}
+        \]
+        Final biomass:
+        \[
+        B_{\text{tot}} = 50.461 \quad \mathrm{Kg}
+        \]
+        Here, no mixing appears to be the optimal strategy.
 
-The optimal mixing matrix is:
-\[
-\mathbf{M}_1 =
-\begin{pmatrix}
-0 & 0 & 1 \\
-1 & 0 & 0 \\
-0 & 1 & 0
-\end{pmatrix}
-\]
+    \item Configuration 3 (biomass initially in layer \#3): \\
+        Optimal matrix:
+        \[
+        \mathbf{P}_3 =
+        \begin{pmatrix}
+        1 & 0 & 0 \\
+        0 & 0 & 1 \\
+        0 & 1 & 0
+        \end{pmatrix}
+        \]
+        Final biomass:
+        \[
+        B_{\text{tot}} = 50.447 \quad \mathrm{Kg}
+        \]
+        This configuration corresponds to the permutation of layers 2 and 3.
+    \item Configuration 4 : uniform distribution \\
+        Optimal matrix:
+        \[
+        \mathbf{P}_4 =
+        \begin{pmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+        \end{pmatrix}
+        \]
+        Final biomass:
+        \[
+        B_{\text{tot}} = 50.370 \quad \mathrm{Kg}
+        \]
+        As in case 2, no mixing appears to be the optimal strategy.
+\end{itemize}
 
-This matrix induces a permutation of layers which induces the allocation of layer 1 in position 2, corresponding to the largest growth coefficient.
-Here is a graphic representing the total algae mass in each layer as a function of time, with the latter permutation matrix.
+\subsection{Discussion}
+
+The results reveal a strong dependence of the optimal strategy on the initial configuration.
+
+When biomass is initially located in a layer with high growth rate, 
+the identity permutation (i.e., no mixing) is optimal. We observe the same phenomenon for a uniform initial distribution.
+In contrast, when biomass is initially located in less favorable layers, 
+the optimal permutations transport biomass toward layers with higher growth rates.
+
+More generally, the optimal permutation matrices tend to concentrate biomass 
+in the layers maximizing the local growth coefficient $\mu$.
+
+This behavior is consistent with the physical interpretation of the system:
+the mixing strategy aims at maximizing the effective light exposure experienced 
+by the biomass over time.
+
+These observations will serve as a basis for the analysis of more general 
+mixing strategies in the following sections.
+
+
+Here is a graphic representing the total algae mass in each layer as a function of time, for configuration 3 and using the mixing matrix $\mathbf{P}_3$..
 
 \begin{figure}[H]
     \centering
@@ -641,157 +754,114 @@ Here is a graphic representing the total algae mass in each layer as a function 
     \label{fig:t0}
 \end{figure}
 
-\subsubsection{Configuration 2: biomass initially in layer 2}
+We notice that the algae concentration converges to a limit in each layer. As supposed earlier, 
+the vector of concentrations in the column corresponding to the paddle converges to an eigen vector of the matrix. This phenomenon has been observed
+with different initial conditions, and with $N$ varying from $3$ to $7$.
 
-The maximal total biomass obtained is:
+\section{Structural Insights from Permutation-Based Optimization}
+
+\subsection{Emerging Patterns in Optimal Permutations}
+
+The exhaustive optimization over permutation matrices reveals consistent structural patterns 
+across all tested configurations and system sizes.
+
+In all cases, the optimal permutations exhibit a strong tendency to transport biomass toward 
+layers associated with higher growth rates. More precisely, the permutation matrices maximizing 
+the objective function $J(P)$ tend to map a large fraction of the biomass trajectories toward 
+the subset of layers where the growth coefficient $\mu$ is maximal.
+
+This behavior is observed regardless of the initial condition, although the optimal permutation 
+depends on the initial localization of the biomass.
+
+\subsection{Interpretation in Terms of Biomass Trajectories}
+
+A permutation matrix defines a deterministic mapping between layers. 
+Iterating such a matrix over time induces periodic trajectories for each biomass element.
+
+Therefore, instead of interpreting the mixing process as a spatial redistribution, 
+it is natural to adopt a Lagrangian viewpoint and consider the temporal trajectories 
+experienced by individual biomass particles.
+
+Under this interpretation, a permutation matrix generates cyclic trajectories:
 \[
-B_{\text{tot}} = 50.461 \quad \mathrm{Kg}
+i \mapsto P(i) \mapsto P^2(i) \mapsto \cdots
 \]
 
-The optimal mixing matrix is:
+The growth of each biomass element is then governed by the sequence of light intensities 
+encountered along its trajectory.
+
+\subsection{Connection with the Flashing Light Effect}
+
+The observed structure of optimal permutations can be directly related to the flashing light effect.
+
+As discussed previously, the photosynthetic response is nonlinear with respect to light intensity. 
+In particular:
+\begin{itemize}
+    \item high light intensities may lead to saturation or photoinhibition,
+    \item low light intensities result in suboptimal growth,
+    \item intermittent exposure can enhance overall efficiency.
+\end{itemize}
+
+Permutation-based mixing induces structured temporal alternations between different light environments. 
+In particular, optimal permutations tend to maximize the time spent in high-growth layers while still 
+maintaining temporal variability.
+
+This suggests that the optimization process naturally balances two competing effects:
+\begin{itemize}
+    \item maximizing exposure to favorable conditions,
+    \item avoiding constant exposure that would reduce efficiency.
+\end{itemize}
+
+\subsection{Extremal Nature of Optimal Strategies}
+
+An important observation is that permutation matrices correspond to extremal points 
+of the set of bistochastic matrices.
+
+Indeed, any bistochastic matrix can be written as a convex combination of permutation matrices:
 \[
-\mathbf{M}_2 =
-\begin{pmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0 \\
-0 & 0 & 1
-\end{pmatrix}
+P = \sum_{k} \lambda_k P_k, \quad \lambda_k \geq 0, \quad \sum_k \lambda_k = 1.
 \]
 
-Here, not mixing appears to be the optimal strategy.
+From this perspective, stochastic or bistochastic mixing can be interpreted as a probabilistic 
+combination of deterministic trajectories.
 
-\subsubsection{Configuration 3: biomass initially in layer 3}
+The numerical results suggest that such averaging effects are detrimental to the objective function. 
+Indeed, spreading biomass over multiple trajectories tends to reduce the temporal contrast in light exposure, 
+thereby weakening the flashing light effect.
 
-The maximal total biomass obtained is:
-\[
-B_{\text{tot}} = 50.447 \quad \mathrm{Kg}
-\]
+In contrast, permutation matrices preserve fully coherent trajectories, which appear to be more favorable 
+for growth.
 
-The optimal mixing matrix is:
-\[
-\mathbf{M}_3 =
-\begin{pmatrix}
-1 & 0 & 0 \\
-0 & 0 & 1 \\
-0 & 1 & 0
-\end{pmatrix}
-\]
+\subsection{Heuristic Explanation of Optimality}
 
-This configuration corresponds to the permutation of layers 2 and 3.
+The previous observations lead to the following heuristic explanation:
 
-\subsection{other initial configurations, 5 layers}
-\begin{table}[H]
-\centering
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Layer} & \textbf{$\mu$ (s$^{-1}$)} & \textbf{I} ($\mu$\text{mol} $m^{-2} s^{-1}$)\\
-\hline
-Layer 1 & $1.4198 \times 10^{-5}$ & 1500 \\
-Layer 2 & $2.4558 \times 10^{-5}$ & 597.8 \\
-Layer 3 & $3.2373 \times 10^{-5}$ & 238.2 \\
-Layer 4 & $3.1229 \times 10^{-5}$ & 94.94 \\
-Layer 5 & $2.2153 \times 10^{-5}$ & 37.83 \\
-\hline
-\end{tabular}
-\end{table}
-\subsubsection{Configuration 1: biomass initially in layer 1}
-After a period T= 300 $s$ of growth, the total biomass obtained is:
-\[
-B_{\text{tot}} = 50.390 \quad \mathrm{Kg}
-\]
+\begin{quote}
+Optimal mixing strategies maximize the temporal variability of light exposure 
+while ensuring frequent visits to high-growth regions.
+\end{quote}
 
-Optimal mixing matrix:
-\[
-\mathbf{M}_1 =
-\begin{pmatrix}
-0 & 0 & 0 & 1 & 0 \\
-0 & 1 & 0 & 0 & 0 \\
-1 & 0 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1
-\end{pmatrix}
-\]
-Here again, let us represent the successive biomass values associated to the tested permutation matrices :
+Permutation matrices naturally achieve this by:
+\begin{itemize}
+    \item enforcing structured, periodic trajectories,
+    \item avoiding diffusive spreading of biomass,
+    \item concentrating exposure in favorable layers.
+\end{itemize}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.6\textwidth]{biomasses recherche matrice N=5.png}
-\end{figure}
-\subsubsection{Configuration 2: biomass initially in layer 2}
+This provides a qualitative explanation for the empirical observation that optimal solutions 
+are consistently found among permutation matrices.
 
-Total biomass obtained:
-\[
-B_{\text{tot}} = 50.443 \quad \mathrm{Kg}
-\]
+\subsection{Implications for the Continuous Optimization Problem}
 
-Optimal mixing matrix:
-\[
-\mathbf{M}_2 =
-\begin{pmatrix}
-1 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 \\
-0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1
-\end{pmatrix}
-\]
+These structural insights strongly suggest that the relaxation of the optimization problem 
+to larger sets (stochastic or bistochastic matrices) may not lead to better solutions.
 
-\subsubsection{Configuration 3: biomass initially in layer 3}
+Instead, it is expected that optimal solutions remain located near the extremal points 
+of the admissible set.
 
-Total biomass obtained:
-\[
-B_{\text{tot}} = 50.488 \quad \mathrm{Kg}
-\]
+This hypothesis will be investigated in the following sections using gradient-based optimization 
+methods over continuous matrix spaces.
 
-Optimal mixing matrix:
-\[
-\mathbf{M}_3 =
-\begin{pmatrix}
-1 & 0 & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 0 & 1
-\end{pmatrix}
-\]
-
-\subsubsection{Configuration 4: biomass initially in layer 4}
-
-Total biomass obtained:
-\[
-B_{\text{tot}} = 50.480 \quad \mathrm{Kg}
-\]
-
-Optimal mixing matrix:
-\[
-\mathbf{M}_4 =
-\begin{pmatrix}
-0 & 1 & 0 & 0 & 0 \\
-1 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 \\
-0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1
-\end{pmatrix}
-\]
-
-\subsubsection{Configuration 5: biomass initially in layer 5}
-
-Total biomass obtained:
-\[
-B_{\text{tot}} = 50.431 \quad \mathrm{Kg}
-\]
-
-Optimal mixing matrix:
-\[
-\mathbf{M}_5 =
-\begin{pmatrix}
-1 & 0 & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 \\
-0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0
-\end{pmatrix}
-\]
 \section{Mixing Optimization : Optimal Stochastic Mixing-Matrix}
 
 Now that we have found a way to determine the best permutation matrix for the water pond, let us now focus on a more general case : the column stochastic matrices. 
@@ -858,6 +928,8 @@ In order to choose an appropriate learning rate for the Adam optimization algori
 
 It is clear that the best learning rate is $\alpha = 0.9$. It reaches a plateau after about 12 iterations. Based on this observation, we can arbitrarely bond the number of iterations by 12.
 
+\subsubsection{optimal stochastic matrix}
+
 For 10 layers, the approximate optimal matrix is the following.
 
 \[
@@ -901,32 +973,15 @@ After lauching the program for a $10$ layers pond, we end up with the following 
 
 This mixing matrix corresponds to a final biomass (after $T = 300s$ of growth) of $B_{\text{tot}} = 50.369 \quad \mathrm{Kg}$.
 
-Let us try to launch the algorithm with an initial permutation matrix. We notice that it converges with a similar pattern for each matrix. 
-For example, starting from the identity, the algorithm returns the following matrix.
+The previous optimal permutation matrix algorithm allows us to compare the best permutation matrix to the bistochastic case, and to check if a bistochastic relaxation leads to a higher performance.
+In fact, what was shown by the simulations, is that the optimal permutation matrices are at least a local maximum of the objective function on the set of bistochastic matrices. Indeed, launching the optimization algorithm 
+with a starting point at the optimal permutation matrix leads to a plateau. This implies that no better bistochastic matrix near the permutation matrix can be found. 
 
-\[
-\begin{pmatrix}
-0.2263 & 0.0860 & 0.0861 & 0.0859 & 0.0859 & 0.0860 & 0.0859 & 0.0859 & 0.0861 & 0.0859 \\
-0.0841 & 0.2321 & 0.0856 & 0.0855 & 0.0855 & 0.0855 & 0.0855 & 0.0855 & 0.0855 & 0.0854 \\
-0.0867 & 0.0863 & 0.2309 & 0.0850 & 0.0850 & 0.0850 & 0.0850 & 0.0850 & 0.0847 & 0.0863 \\
-0.0865 & 0.0850 & 0.0853 & 0.2317 & 0.0853 & 0.0853 & 0.0853 & 0.0852 & 0.0852 & 0.0850 \\
-0.0873 & 0.0850 & 0.0852 & 0.0852 & 0.2316 & 0.0852 & 0.0852 & 0.0852 & 0.0851 & 0.0850 \\
-0.0875 & 0.0849 & 0.0852 & 0.0852 & 0.0852 & 0.2315 & 0.0852 & 0.0851 & 0.0851 & 0.0849 \\
-0.0870 & 0.0850 & 0.0852 & 0.0852 & 0.0852 & 0.0852 & 0.2316 & 0.0852 & 0.0851 & 0.0850 \\
-0.0860 & 0.0851 & 0.0853 & 0.0853 & 0.0853 & 0.0853 & 0.0853 & 0.2319 & 0.0852 & 0.0850 \\
-0.0849 & 0.0853 & 0.0855 & 0.0854 & 0.0854 & 0.0854 & 0.0854 & 0.0854 & 0.2322 & 0.0853 \\
-0.0835 & 0.0854 & 0.0856 & 0.0855 & 0.0856 & 0.0856 & 0.0856 & 0.0855 & 0.0856 & 0.2322
-\end{pmatrix}
-\]
+L’ensemble admissible étant convexe, ses points extrémaux (matrices de permutation) jouent un rôle particulier. Nos résultats numériques et analytiques suggèrent que la structure du fonctionnel favorise ces points extrémaux, en cohérence avec l’interprétation physique du flashing effect
+\section{Flashing effect}
 
-wich is an affine translation of the identity. But the final biomass is lower than the one associated with the first matrix : starting the gradient descent from the identity brings us to a local maximum of $B_{\text{tot}} = 50.357 \quad \mathrm{Kg}$.
-There seems to be a local maximum of the objective function "near" each permutation matrix. As observed in simulations, launching the gradient descent with a permutation matrix $P$ will converge to a bistochastic matrix close to :
-\[ 0.086*E + 0.14*P\] where $E = (1)_{1\leq i, j \leq I}$.
-
-
-
-\section{research perspectives and next steps in the work plan}
-As an immediate next step, we can compute this algorithm starting from different types of bistochastic matrices, to get a better idea of the surface generated by the function on the set of bistochastic matrices. Furthermore, we could try to find a way to associate a matrix to a real-life paddle wheel to try and compare the optimization results to reality.
+We have observed a phenomenon of higher growth as the basin's length lowers. For the same parameters, excepted the length L, the algae tend to grow more when the number of mixes increases. 
+This can be explained by the fact that if each "layer", for the same total growing time T, gets to each position a larger number of times. 
 
 \section{annexes}
 \subsection{initial test}

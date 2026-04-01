@@ -200,7 +200,7 @@ SCHEMAS = {
     }
 }
 
-def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
+def modèle_stochastique(X, t, p, params, schema="advection_diffusion_terme_source",
                         compare=False, f=None, alpha=None, beta=None, gamma=None):
     N_lignes = params["N"]
     nb_colonnes = params["nb_colonnes_default"]
@@ -224,7 +224,7 @@ def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
 
     nb_itérations = int(t / delta_t)
 
-    #masse_par_couche = [[] for _ in range(N_lignes)]
+    masse_par_couche = [[] for _ in range(N_lignes)]
     if t == 0:
         return np.copy(X)
 
@@ -235,8 +235,8 @@ def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
 
     for step in range(nb_itérations + 1):
         X1 = Mise_a_jour(X1, p, N_lignes, nb_colonnes, L, H, D, u, delta_t, i_s, eps, k_d, k_r, k_h, tau, sigma_H)
-        #for i in range(N_lignes):
-            #masse_par_couche[i].append(sum(X1[i, :]))
+        for i in range(N_lignes):
+            masse_par_couche[i].append(sum(X1[i, :]))
         if compare:
             X_exa = solution_exacte(f, step * delta_t, N_lignes, nb_colonnes,
                                              p, L, H, D, alpha, beta, gamma)
@@ -254,7 +254,7 @@ def modèle_stochastique(X, t, p, params, schema="advection_diffusion_centrée",
         erreurs.append(erreur)
         return X1, np.max(erreurs)
     else:
-        return X1#, masse_par_couche
+        return X1, masse_par_couche
 
 # je construit un autre programme similaire mais qui ne fait qu'une itération en temps :
 
@@ -351,13 +351,13 @@ def X_ini_one_layer(N_lignes, nb_colonnes, k=0, value=1.0):
     X[k, :] = value
     return X
 
-def X_ini_uniform(N_lignes, nb_colonnes):
+def X_ini_uniform(N_lignes, nb_colonnes,  value=1.0):
     X_ini = np.zeros((N_lignes, nb_colonnes))
-    B_tot = 50
     for i in range(N_lignes):
         for j in range(nb_colonnes):
-            X_ini[i, j] = B_tot/(N_lignes*nb_colonnes)
+            X_ini[i, j] = value
     return X_ini
+
 def X_ini_exponential(N_lignes, nb_colonnes, decay=0.3):
     X = np.zeros((N_lignes, nb_colonnes))
     for i in range(N_lignes):
@@ -368,6 +368,12 @@ def X_ini_horizontal_variation(N_lignes, nb_colonnes):
     X = np.zeros((N_lignes, nb_colonnes))
     for j in range(nb_colonnes):
         X[:, j] = np.sin(2 * np.pi * j / nb_colonnes)
+    return X
+
+def X_ini_vertical(N_lignes, nb_colonnes,  value=1.0):
+    X = np.zeros((N_lignes, nb_colonnes))
+    for i in range(N_lignes):
+        X[i, nb_colonnes-1] = value
     return X
 
 def X_ini_random(N_lignes, nb_colonnes, amplitude=1.0, seed=None):
@@ -404,11 +410,6 @@ def matrix_from_list(liste, N_lignes):
         p[i, liste[i]] = 1
     return p
 
-def test(liste, X, t, params):
-    N_lignes = params["N"]
-    p = matrix_from_list(liste, N_lignes)
-    masse_totale_algues = fonction_objectif(X, t, p, params)
-    return(masse_totale_algues, p)
 
 def test_bis(liste, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
                      schema): #plus simple, juste pour vérifier le code
@@ -425,6 +426,11 @@ def test_bis(liste, X, t, N_lignes, nb_colonnes, L, H, D, u, CFL,
     masse_totale_algues = fonction_bis(X, N_lignes)
     return(masse_totale_algues, p)
 
+def test(liste, X, t, params):
+    N_lignes = params["N"]
+    p = matrix_from_list(liste, N_lignes)
+    masse_totale_algues = fonction_objectif(X, t, p, params)
+    return(masse_totale_algues, p)
 
 def meilleure_matrice_de_permutation(X, t, params,
                      schema="advection_diffusion_terme_source"):
@@ -442,7 +448,7 @@ def meilleure_matrice_de_permutation(X, t, params,
             liste_biomasses.append(masse_totale_algues)
             if masse_totale_algues > meilleure_masse:
                 meilleure_masse = masse_totale_algues
-                meilleure_matrice = p
+                meilleure_matrice = p.copy()
         else:
             generer_matrice(n-1, X, t, params, liste)
         for i in range(n-1):

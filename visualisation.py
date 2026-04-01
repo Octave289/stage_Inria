@@ -3,7 +3,7 @@ from scipy import integrate
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.animation import FuncAnimation
-from modèle import *
+from modele import *
 
 def dessin_bassin(X):
     fig, ax = plt.subplots()
