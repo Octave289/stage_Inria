@@ -581,7 +581,7 @@ in order to maximize the total biomass produced by the system. In this section, 
 \]
 
 Given an initial biomass distribution $B(0)$, the system is evolved over a fixed time horizon $T$ 
-using a time-discretized dynamical model (to be detailed in Section~\ref{sec:model}). 
+using a time-discretized dynamical model (detailed in Section~\ref{1}). 
 The objective function is defined as the total biomass at final time:
 \[
 J(P) = B_{\text{tot}}(T).
@@ -619,13 +619,16 @@ B_{\text{tot}}(0) = \text{50 Kg}.
 \]
 The growth time is fixed to:
 \[
-T = \text{[TO COMPLETE]},
+T = \text{300 s},
 \]
-and the flow velocity is set to:
+the flow velocity is set to:
 \[
-u = \text{0.1} \mathrm{m\, s^{-1}}
+u = \text{0.1} \mathrm{m\, s^{-1}},
 \]
-
+and the basin length is set to:
+\[
+L = \text{5} \mathrm{m}.
+\]
 300 seconds of growth therefore correspond to approximately 6 laps.
 
 To assess the influence of initial conditions, several configurations are considered :
@@ -640,7 +643,7 @@ This leads to $N$ distinct initial configurations.
 
 \subsubsection{Case $N = 3$}
 
-The growth rates associated with each layer are given in Table~\ref{tab:mu_N3}.
+The growth rates associated with each layer are given in Table ~\ref{tab:mu_N3}.
 
 \begin{table}[H]
 \centering
@@ -732,20 +735,20 @@ The results reveal a strong dependence of the optimal strategy on the initial co
 When biomass is initially located in a layer with high growth rate, 
 the identity permutation (i.e., no mixing) is optimal. We observe the same phenomenon for a uniform initial distribution.
 In contrast, when biomass is initially located in less favorable layers, 
-the optimal permutations transport biomass toward layers with higher growth rates.
-
-More generally, the optimal permutation matrices tend to concentrate biomass 
-in the layers maximizing the local growth coefficient $\mu$.
-
-This behavior is consistent with the physical interpretation of the system:
+the optimal permutations transport biomass toward layers with higher growth rates. For example, in configuration $1$, if line $i$ has the highest 
+growth coefficient, the optimal permutation matrix always verifies $P_{i, 1} = 1$. This means  that
+the first layer, initially containing all the biomass is allocated to the region of highest growth.
+This behavior is observed regardless of the initial condition, although the optimal permutation 
+depends on the initial localization of the biomass.
+It is consistent with the physical interpretation of the system:
 the mixing strategy aims at maximizing the effective light exposure experienced 
 by the biomass over time.
 
 These observations will serve as a basis for the analysis of more general 
 mixing strategies in the following sections.
 
-
-Here is a graphic representing the total algae mass in each layer as a function of time, for configuration 3 and using the mixing matrix $\mathbf{P}_3$..
+However, as time passes, the mixing matrix makes the basin more and more homogenous. As supposed earlier, we notice that the mixing tend to equalize the algae concentration in each layer.
+Here is a graphic representing the total algae mass in each layer as a function of time, for configuration 3 and using the mixing matrix $\mathbf{P}_3$.
 
 \begin{figure}[H]
     \centering
@@ -753,25 +756,9 @@ Here is a graphic representing the total algae mass in each layer as a function 
     \caption{biomass in each layer through time}
     \label{fig:t0}
 \end{figure}
-
-We notice that the algae concentration converges to a limit in each layer. As supposed earlier, 
-the vector of concentrations in the column corresponding to the paddle converges to an eigen vector of the matrix. This phenomenon has been observed
+ 
+The vector of concentrations in the column corresponding to the paddle converges to a multiple of an eigen vector of the matrix. This phenomenon has been observed
 with different initial conditions, and with $N$ varying from $3$ to $7$.
-
-\section{Structural Insights from Permutation-Based Optimization}
-
-\subsection{Emerging Patterns in Optimal Permutations}
-
-The exhaustive optimization over permutation matrices reveals consistent structural patterns 
-across all tested configurations and system sizes.
-
-In all cases, the optimal permutations exhibit a strong tendency to transport biomass toward 
-layers associated with higher growth rates. More precisely, the permutation matrices maximizing 
-the objective function $J(P)$ tend to map a large fraction of the biomass trajectories toward 
-the subset of layers where the growth coefficient $\mu$ is maximal.
-
-This behavior is observed regardless of the initial condition, although the optimal permutation 
-depends on the initial localization of the biomass.
 
 \subsection{Interpretation in Terms of Biomass Trajectories}
 
@@ -790,11 +777,23 @@ i \mapsto P(i) \mapsto P^2(i) \mapsto \cdots
 The growth of each biomass element is then governed by the sequence of light intensities 
 encountered along its trajectory.
 
-\subsection{Connection with the Flashing Light Effect}
+\section{Connection with the Flashing Light Effect}
 
-The observed structure of optimal permutations can be directly related to the flashing light effect.
+We have observed an interesting phenomenon by modifying the basin length. 
+\begin{figure}[H]
+    \includegraphics{biomasse (pour meilleure matrice de permutation) en fonction de L.png}
+    \caption{optimal biomass as a function of $L$}
+    \label{fig:t2}
+\end{figure}
+For the same parameters, excepted the length L, the algae tend to grow more when the legth $L$ decreases. However, for smaller values of $L$ $(L \leq 20)$, 
+the total production of biomass becomes an increasing function of $L$.
+Let us notice that as $L$ gets smaller, the number of mixes for each algea tends to increase. 
+This phenomenon is called the flashing effect, and has been observed and analyzed in.....
 
-As discussed previously, the photosynthetic response is nonlinear with respect to light intensity. 
+As the number of mixes increases, each algea particule gets to see a higher intensity (at the surface of the pond) more frequently. 
+Therefore, as this frequence varies, the percentage of PSU in each state (inhibited, open and closed) also varies. 
+This brings us to study how exactly does this frequence influences the biomass production.
+In fact, as shown in .... the photosynthetic response is nonlinear with respect to light intensity. 
 In particular:
 \begin{itemize}
     \item high light intensities may lead to saturation or photoinhibition,
@@ -802,17 +801,222 @@ In particular:
     \item intermittent exposure can enhance overall efficiency.
 \end{itemize}
 
-Permutation-based mixing induces structured temporal alternations between different light environments. 
-In particular, optimal permutations tend to maximize the time spent in high-growth layers while still 
-maintaining temporal variability.
-
-This suggests that the optimization process naturally balances two competing effects:
+In our work, the observed structure of optimal permutations can be directly related to the flashing light effect.
+This effect suggests that the optimization process naturally balances two competing effects:
 \begin{itemize}
-    \item maximizing exposure to favorable conditions,
+    \item maximizing exposure to favorable conditions (high-growth layers),
     \item avoiding constant exposure that would reduce efficiency.
 \end{itemize}
 
-\subsection{Extremal Nature of Optimal Strategies}
+In Table~\ref{fig:t2}, the optimal length seems to be $L = 17 \ \mathrm{m}$. For computational reasons, we will keep the length at $L = 5 \ \mathrm{m}$.
+
+Permutation-based mixing will be later compared to a more general case : bistochastic-based mixing. 
+In fact, permutation-based mixing induces more alternations between different light environments than the latter. This indicates that permutation 
+matrices could bring a higher performance than bistochastic matrices. This will be looked through later.
+
+\section{Relaxation to Stochastic Mixing Matrices}
+
+\subsection{Motivation}
+
+Now that we have found a way to determine the best permutation matrix for the water pond, let us now focus on a more general case : the column stochastic matrices. 
+To optimize on this infinite space, we will have to use a differentiable program.
+We have chosen the torch python library to do so. This will allow us to compute torch differentiation with these variables.
+
+\subsection{Admissible Set and Parametrization}
+
+We consider the set of column-stochastic matrices:
+\[
+\mathcal{S}_N = \left\{ P \in \mathbb{R}^{N \times N} \mid P_{ij} \geq 0, \; \sum_{i=1}^{N} P_{ij} = 1 \right\}.
+\]
+
+In order to handle these constraints within a differentiable optimization framework, 
+we introduce an unconstrained matrix $Q \in \mathbb{R}^{N \times N}$ and define:
+\[
+P_{ij} = \frac{\exp(Q_{ij})}{\sum_{k=1}^{N} \exp(Q_{kj})}.
+\]
+
+This parametrization ensures that $P$ remains column-stochastic for any $Q$, 
+while allowing unconstrained optimization in $\mathbb{R}^{N \times N}$.
+\subsection{Optimization Procedure}
+
+The objective function remains unchanged:
+\[
+J(P) = B_{\text{tot}}(T).
+\]
+
+The optimization is performed using a gradient-based method applied to the parameter matrix $Q$.
+
+Gradients are computed through automatic differentiation, using a differentiable implementation 
+of the dynamical model.
+
+The update rule is given by:
+\[
+Q \leftarrow Q + \alpha \nabla_Q J,
+\]
+where $\alpha$ denotes the learning rate.
+
+In practice, we employ the Adam optimizer, which provides adaptive step sizes and improves 
+convergence properties.
+
+\subsection{Numerical Setup}
+
+The relaxation allows us to consider larger systems, typically:
+\[
+N = \text{10}.
+\]
+
+The initial biomass is concentrated in a single layer:
+\[
+B(0) = \text{50 Kg}.
+\]
+
+The time horizon and flow parameters are identical to those used in the discrete optimization:
+\[
+T = \text{300 s}, \quad u = \text{0.1 m.s^{-1}}.
+\]
+
+The optimization is initialized from:
+\begin{itemize}
+    \item either a random matrix $Q$,
+    \item or a structured initialization (to be specified).
+\end{itemize}
+
+\subsection{Optimal Stochastic Matrix}
+
+
+The algorithm complexity is a linear function of the number of layers (cf annexes).
+Therefore, it allows us to divide the water pond into a larger number of layers. 
+
+For $N = \text{10}$, the optimization yields the following matrix:
+
+\[
+P^\star =
+\begin{pmatrix}
+0.000 & 0.003 & 0.010 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.001 & 0.004 \\
+0.000 & 0.011 & 0.001 & 0.020 & 0.000 & 0.000 & 0.000 & 0.007 & 0.004 & 0.006 \\
+0.000 & 0.009 & 0.008 & 0.003 & 0.000 & 0.000 & 0.000 & 0.005 & 0.004 & 0.004 \\
+0.001 & 0.394 & 0.373 & 0.080 & 0.000 & 0.000 & 0.002 & 0.112 & 0.151 & 0.082 \\
+0.003 & 0.285 & 0.251 & 0.072 & 0.012 & 0.000 & 0.504 & 0.073 & 0.193 & 0.051 \\
+0.992 & 0.095 & 0.076 & 0.443 & 0.985 & 0.999 & 0.345 & 0.511 & 0.331 & 0.599 \\
+0.003 & 0.087 & 0.140 & 0.371 & 0.001 & 0.000 & 0.142 & 0.283 & 0.268 & 0.203 \\
+0.000 & 0.103 & 0.131 & 0.005 & 0.001 & 0.000 & 0.005 & 0.001 & 0.041 & 0.045 \\
+0.000 & 0.007 & 0.005 & 0.006 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.002 \\
+0.000 & 0.007 & 0.006 & 0.000 & 0.000 & 0.000 & 0.000 & 0.005 & 0.005 & 0.002
+\end{pmatrix}
+\]
+
+As seen before, the line 6 has the largest coefficients because layer 6 has the highest growth coefficient. The optimal matrix allocates most of the biomass in this layer.
+But stochastic matrices aren't physically relevant. Indeed, in terms of water volume, a real-life paddle wheel should allocate to each layer exactly the volume of one layer. 
+Such a wheel could only be represented by a bistochastic matrix.
+
+\section{Optimization under Bistochastic Constraints}
+
+\subsection{Motivation}
+
+While stochastic matrices provide a convenient relaxation of the original problem, 
+they lack a clear physical interpretation in the context of mixing processes.
+
+Indeed, a realistic mixing mechanism (such as a paddle wheel) must conserve the volume 
+of each layer. This implies that the mixing matrix must preserve both column sums 
+and row sums.
+
+This motivates restricting the admissible set to bistochastic matrices:
+\[
+\mathcal{B}_N = \left\{ P \in \mathbb{R}^{N \times N} \mid P_{ij} \geq 0,\;
+\sum_{i=1}^{N} P_{ij} = 1,\;
+\sum_{j=1}^{N} P_{ij} = 1 \right\}.
+\]
+
+From a physical perspective, bistochastic matrices represent volume-preserving 
+redistribution of biomass across layers.
+
+\subsection{Optimization Strategy}
+
+The optimization problem remains:
+\[
+\max_{P \in \mathcal{B}_N} J(P).
+\]
+
+In order to handle the additional row constraints, we adopt a penalized formulation.
+
+Starting from the softmax parametrization used for stochastic matrices, 
+we introduce a penalty term enforcing row normalization:
+\[
+\tilde{J}(P) = J(P) - \lambda \sum_{i=1}^{N} \left( \sum_{j=1}^{N} P_{ij} - 1 \right)^2,
+\]
+where $\lambda > 0$ is a penalty parameter.
+
+The optimization is then performed over the unconstrained matrix $Q$, 
+as in the previous section.
+
+As the objective function is non-convex, the obtained solutions may depend on initialization and may correspond to local optima.
+
+\subsection{Numerical Results}
+
+After lauching the program for a $10$ layers pond, we end up with the following matrix.
+
+\[
+\begin{bmatrix}
+0.1727 & 0.0401 & 0.1280 & 0.1118 & 0.0686 & 0.0839 & 0.0447 & 0.2331 & 0.0285 & 0.0885 \\
+0.0422 & 0.2675 & 0.0660 & 0.1765 & 0.0297 & 0.0281 & 0.1194 & 0.1010 & 0.0907 & 0.0790 \\
+0.2268 & 0.0297 & 0.1286 & 0.0654 & 0.0687 & 0.0290 & 0.2182 & 0.0791 & 0.1469 & 0.0075 \\
+0.1335 & 0.1178 & 0.0531 & 0.0894 & 0.1766 & 0.0053 & 0.0866 & 0.0164 & 0.0864 & 0.2348 \\
+0.2559 & 0.0255 & 0.3115 & 0.0160 & 0.0122 & 0.0688 & 0.0067 & 0.1059 & 0.1850 & 0.0123 \\
+0.0238 & 0.3348 & 0.0341 & 0.0567 & 0.2197 & 0.0715 & 0.0415 & 0.0387 & 0.1417 & 0.0375 \\
+0.0467 & 0.0217 & 0.0830 & 0.3417 & 0.0783 & 0.0183 & 0.2618 & 0.0856 & 0.0249 & 0.0380 \\
+0.0410 & 0.0510 & 0.0688 & 0.0451 & 0.2185 & 0.1392 & 0.0301 & 0.2752 & 0.1097 & 0.0213 \\
+0.0356 & 0.0181 & 0.0586 & 0.0700 & 0.1100 & 0.5202 & 0.0761 & 0.0173 & 0.0743 & 0.0198 \\
+0.0218 & 0.0936 & 0.0683 & 0.0274 & 0.0177 & 0.0357 & 0.1148 & 0.0476 & 0.1119 & 0.4613
+\end{bmatrix}
+\]
+
+This mixing matrix corresponds to a final biomass (after $T = 300s$ of growth) of $B_{\text{tot}} = 50.369 \quad \mathrm{Kg}$.
+
+\subsection{Comparison with Permutation Matrices}
+
+The previous optimal permutation matrix algorithm allows us to compare the best permutation matrix to the bistochastic case
+A key question is whether relaxing the admissible set from permutation matrices 
+to bistochastic matrices leads to improved performance.
+
+\subsection{Local Optimality of Permutation Matrices}
+
+To further investigate the relationship between permutation and bistochastic matrices, 
+we perform the following experiment:
+
+\begin{itemize}
+    \item initialize the gradient-based optimization at an optimal permutation matrix,
+    \item run the optimization under bistochastic constraints.
+\end{itemize}
+
+In all tested cases, the algorithm converges to a plateau without departing 
+significantly from the initial permutation matrix.
+
+In other words, small perturbations of a permutation matrix within $\mathcal{B}_N$ 
+do not lead to an increase in the objective function.
+This suggests that, for a given permutation matrix $P^\star$, there exists a neighborhood 
+$\mathcal{U} \subset \mathcal{B}_N$ such that:
+\[
+J(P) \leq J(P^\star), \quad \forall P \in \mathcal{U}.
+\]
+
+In other words, permutation matrices behave as locally optimal solutions 
+within the admissible set.
+
+
+\subsection{Interpretation}
+
+Although the admissible set has been extended to include all physically relevant 
+mixing strategies, the optimal solutions remain located near extremal points 
+of the feasible set.
+
+In fact, what the simulations seem to indicate, is that the optimal permutation matrices are at least a local maximum of the objective function 
+on the set of bistochastic matrices. The bistochastic optimization does not produce solutions 
+that significantly outperform the best permutation matrices.
+The results indicate that:
+\[
+J_{\text{bistochastic}} \leq J_{\text{permutation}} \quad \text{(observed numerically)}.
+\]
+\subsubsection{Extremal Nature of Optimal Strategies}
 
 An important observation is that permutation matrices correspond to extremal points 
 of the set of bistochastic matrices.
@@ -834,154 +1038,84 @@ for growth.
 
 \subsection{Heuristic Explanation of Optimality}
 
-The previous observations lead to the following heuristic explanation:
 
-\begin{quote}
-Optimal mixing strategies maximize the temporal variability of light exposure 
+This phenomenon can be interpreted in light of the structure of the objective function.
+
+The function $J(P)$ depends on the temporal evolution of biomass under repeated application 
+of the mixing matrix. As discussed earlier, growth is enhanced by temporal variability 
+in light exposure. Optimal mixing strategies must therefore maximize the temporal variability of light exposure 
 while ensuring frequent visits to high-growth regions.
-\end{quote}
 
-Permutation matrices naturally achieve this by:
+In a Lagrangian point of vue, coherent and structured trajectories for each algae maximize 
+this variability. These types of trajectories are induced by permutation matrices.
+
+In contrast, bistochastic matrices introduce averaging effects by splitting biomass 
+across multiple pathways. This reduces the temporal variability of light exposure, 
+thereby weakening the flashing light effect.
+
+As a consequence, any local perturbation of a permutation matrix in a direction 
+that increases mixing tends to decrease the objective function.
+
+
+\subsection{Conclusion}
+
+The bistochastic optimization does not lead to significant improvements over 
+permutation-based strategies, despite the larger admissible set.
+
+Combined with the structural insights obtained previously, this suggests that 
+optimal mixing strategies are inherently extremal.
+
+This observation will be further discussed in the final section, where we address 
+the implications and limitations of these findings.
+
+\section{Towards Global Optimality}
+
+While the local optimality of permutation matrices is strongly supported by numerical evidence, 
+establishing global optimality remains a challenging problem.
+
+Indeed, the objective function $J$ is highly nonlinear and non-convex, 
+due to the coupling between transport dynamics and biological growth.
+
+Therefore, standard convex optimization arguments cannot be directly applied.
+
+Nevertheless, several observations suggest that permutation matrices may also be globally optimal:
+
 \begin{itemize}
-    \item enforcing structured, periodic trajectories,
-    \item avoiding diffusive spreading of biomass,
-    \item concentrating exposure in favorable layers.
+    \item exhaustive search for small values of $N$ consistently identifies permutations 
+    as global maximizers;
+    
+    \item gradient-based optimization over larger admissible sets does not produce 
+    better-performing solutions;
 \end{itemize}
 
-This provides a qualitative explanation for the empirical observation that optimal solutions 
-are consistently found among permutation matrices.
+\subsection{Conjecture}
 
-\subsection{Implications for the Continuous Optimization Problem}
+Based on these observations, we formulate the following conjecture:
 
-These structural insights strongly suggest that the relaxation of the optimization problem 
-to larger sets (stochastic or bistochastic matrices) may not lead to better solutions.
+\begin{quote}
+For the class of models considered in this work, the global maximizers of the objective function 
+over the set of bistochastic matrices are permutation matrices.
+\end{quote}
 
-Instead, it is expected that optimal solutions remain located near the extremal points 
-of the admissible set.
+This conjecture is supported by both numerical evidence and physical arguments, 
+but a rigorous proof remains an open question.
 
-This hypothesis will be investigated in the following sections using gradient-based optimization 
-methods over continuous matrix spaces.
+\subsection{Limitations and Perspectives}
 
-\section{Mixing Optimization : Optimal Stochastic Mixing-Matrix}
+Several limitations must be acknowledged.
 
-Now that we have found a way to determine the best permutation matrix for the water pond, let us now focus on a more general case : the column stochastic matrices. 
-The initial problem is indeed defined with $P$ a $N \times N$ column-stocastic matrix. To optimize on this infinite space, we will have to use a differentiable program.
-We have chosen the torch python library to do so. In the update fonction, we have to convert every numpy list and array into a torch variable. This will allow us to compute torch differentiation with these variables. 
-Furthermore, to process the matrix constraints (non negative coefficients and every column must sum 1), we will use the softmax function, in order to differentiate with respect an unconstrained matrix $Q$.
+First, the numerical exploration of the admissible set remains partial for large values of $N$, 
+and the possibility of better solutions cannot be completely ruled out.
 
-The objective function remains the same.
+Second, the optimization process may converge to local maxima depending on initialization, 
+although consistent results were obtained across multiple runs.
 
-\subsection{Optimal stochastic matrix}
-
-
-Let us now use the original objective function, i.e the final biomass after a given growth period $T$. 
-As before, the growth time remains $T = 300 s$ and the initial conditions are that the total biomass is in layer 1. The algorithm complexity is a linear function of the number of layers.
-Therefore, it allows us to divide the water pond in 10 layers. 
-
-\subsubsection{optimizer parameters}
-
-The Adam optimizer (Adaptive Moment Estimation) combines momentum-based gradient descent with per-parameter adaptive learning rates. 
-At each iteration $t$, it maintains an exponential moving average of the gradient $m_t$ (first moment) and of the squared gradient $v_t$ (second moment), defined as
-\[
-m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t, \qquad
-v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2,
-\]
-where $g_t$ denotes the gradient of the loss with respect to the parameters. These moment estimates are corrected for initialization bias as
-\[
-\hat m_t = \frac{m_t}{1-\beta_1^t}, \qquad
-\hat v_t = \frac{v_t}{1-\beta_2^t}.
-\]
-The parameter update is then given by
-\[
-\theta_{t+1} = \theta_t - \alpha \frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon},
-\]
-where $\alpha$ is the global learning rate, while $\beta_1$ and $\beta_2$ control the exponential decay rates of the first and second moments, respectively, governing the trade-off between stability and responsiveness of the optimization process.
-
-In order to choose an appropriate learning rate for the Adam optimization algorithm, we performed a learning rate finder experiment. The principle consists in lauching the optimization with different $\alpha$ values, and check which one converges the quickest. 
-
-\begin{figure}[H]
-\centering
-    \begin{subfigure}{0.3\textwidth}
-        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.01.png}
-        \subcaption*{(a)}
-        \label{fig:lr_0.01}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.3\textwidth}
-        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.1.png}
-        \subcaption*{(b)}
-        \label{fig:lr_0.1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.3\textwidth}
-        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.9.png}
-        \subcaption*{(c)}
-        \label{fig:lr_0.9}
-    \end{subfigure}
-    \caption{
-    (a) $\alpha = 0.01$;
-    (b) $\alpha = 0.1$ ;
-    (c) $\alpha = 0.9$
-    }
-    \label{fig:global}
-\end{figure}
-
-It is clear that the best learning rate is $\alpha = 0.9$. It reaches a plateau after about 12 iterations. Based on this observation, we can arbitrarely bond the number of iterations by 12.
-
-\subsubsection{optimal stochastic matrix}
-
-For 10 layers, the approximate optimal matrix is the following.
-
-\[
-\begin{pmatrix}
-0.000 & 0.003 & 0.010 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.001 & 0.004 \\
-0.000 & 0.011 & 0.001 & 0.020 & 0.000 & 0.000 & 0.000 & 0.007 & 0.004 & 0.006 \\
-0.000 & 0.009 & 0.008 & 0.003 & 0.000 & 0.000 & 0.000 & 0.005 & 0.004 & 0.004 \\
-0.001 & 0.394 & 0.373 & 0.080 & 0.000 & 0.000 & 0.002 & 0.112 & 0.151 & 0.082 \\
-0.003 & 0.285 & 0.251 & 0.072 & 0.012 & 0.000 & 0.504 & 0.073 & 0.193 & 0.051 \\
-0.992 & 0.095 & 0.076 & 0.443 & 0.985 & 0.999 & 0.345 & 0.511 & 0.331 & 0.599 \\
-0.003 & 0.087 & 0.140 & 0.371 & 0.001 & 0.000 & 0.142 & 0.283 & 0.268 & 0.203 \\
-0.000 & 0.103 & 0.131 & 0.005 & 0.001 & 0.000 & 0.005 & 0.001 & 0.041 & 0.045 \\
-0.000 & 0.007 & 0.005 & 0.006 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.002 \\
-0.000 & 0.007 & 0.006 & 0.000 & 0.000 & 0.000 & 0.000 & 0.005 & 0.005 & 0.002
-\end{pmatrix}
-\]
-
-As seen before, the line 6 has the largest coefficients because layer 6 has the highest growth coefficient. The optimal matrix allocates most of the biomass in this layer.
-But stochastic matrices aren't physically relevant. Indeed, in terms of water volume, a real-life paddle wheel should allocate to each layer exactly the volume of one layer. 
-Such a wheel could only be represented by a bistochastic matrix.
-
-\section{Optimal bistochastic matrix}
-
-Using the same solver than before, we only add a penalty to the objective function to impose that the sum on each line of the mixing matrix should equal 1.
-After lauching the program for a $10$ layers pond, we end up with the following matrix.
-
-\[
-\begin{bmatrix}
-0.1727 & 0.0401 & 0.1280 & 0.1118 & 0.0686 & 0.0839 & 0.0447 & 0.2331 & 0.0285 & 0.0885 \\
-0.0422 & 0.2675 & 0.0660 & 0.1765 & 0.0297 & 0.0281 & 0.1194 & 0.1010 & 0.0907 & 0.0790 \\
-0.2268 & 0.0297 & 0.1286 & 0.0654 & 0.0687 & 0.0290 & 0.2182 & 0.0791 & 0.1469 & 0.0075 \\
-0.1335 & 0.1178 & 0.0531 & 0.0894 & 0.1766 & 0.0053 & 0.0866 & 0.0164 & 0.0864 & 0.2348 \\
-0.2559 & 0.0255 & 0.3115 & 0.0160 & 0.0122 & 0.0688 & 0.0067 & 0.1059 & 0.1850 & 0.0123 \\
-0.0238 & 0.3348 & 0.0341 & 0.0567 & 0.2197 & 0.0715 & 0.0415 & 0.0387 & 0.1417 & 0.0375 \\
-0.0467 & 0.0217 & 0.0830 & 0.3417 & 0.0783 & 0.0183 & 0.2618 & 0.0856 & 0.0249 & 0.0380 \\
-0.0410 & 0.0510 & 0.0688 & 0.0451 & 0.2185 & 0.1392 & 0.0301 & 0.2752 & 0.1097 & 0.0213 \\
-0.0356 & 0.0181 & 0.0586 & 0.0700 & 0.1100 & 0.5202 & 0.0761 & 0.0173 & 0.0743 & 0.0198 \\
-0.0218 & 0.0936 & 0.0683 & 0.0274 & 0.0177 & 0.0357 & 0.1148 & 0.0476 & 0.1119 & 0.4613
-\end{bmatrix}
-\]
-
-This mixing matrix corresponds to a final biomass (after $T = 300s$ of growth) of $B_{\text{tot}} = 50.369 \quad \mathrm{Kg}$.
-
-The previous optimal permutation matrix algorithm allows us to compare the best permutation matrix to the bistochastic case, and to check if a bistochastic relaxation leads to a higher performance.
-In fact, what was shown by the simulations, is that the optimal permutation matrices are at least a local maximum of the objective function on the set of bistochastic matrices. Indeed, launching the optimization algorithm 
-with a starting point at the optimal permutation matrix leads to a plateau. This implies that no better bistochastic matrix near the permutation matrix can be found. 
-
-L’ensemble admissible étant convexe, ses points extrémaux (matrices de permutation) jouent un rôle particulier. Nos résultats numériques et analytiques suggèrent que la structure du fonctionnel favorise ces points extrémaux, en cohérence avec l’interprétation physique du flashing effect
-\section{Flashing effect}
-
-We have observed a phenomenon of higher growth as the basin's length lowers. For the same parameters, excepted the length L, the algae tend to grow more when the number of mixes increases. 
-This can be explained by the fact that if each "layer", for the same total growing time T, gets to each position a larger number of times. 
+Future work could focus on:
+\begin{itemize}
+    \item developing analytical tools to characterize the structure of the objective function,
+    \item establishing sufficient conditions for global optimality of permutation matrices,
+    \item exploring connections with optimal transport and control theory.
+\end{itemize}
 
 \section{annexes}
 \subsection{initial test}
@@ -1083,7 +1217,56 @@ Finally, the full optimization procedure consists of $K$ iterations of the Adam 
 \[
 \mathcal{O}\!\left( K\,\frac{a\,N\,n^2\,T}{L} \right).
 \]
+\subsubsection{parameters of the Adam optimizer}
 
+The Adam optimizer (Adaptive Moment Estimation) combines momentum-based gradient descent with per-parameter adaptive learning rates. 
+At each iteration $t$, it maintains an exponential moving average of the gradient $m_t$ (first moment) and of the squared gradient $v_t$ (second moment), defined as
+\[
+m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t, \qquad
+v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2,
+\]
+where $g_t$ denotes the gradient of the loss with respect to the parameters. These moment estimates are corrected for initialization bias as
+\[
+\hat m_t = \frac{m_t}{1-\beta_1^t}, \qquad
+\hat v_t = \frac{v_t}{1-\beta_2^t}.
+\]
+The parameter update is then given by
+\[
+\theta_{t+1} = \theta_t - \alpha \frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon},
+\]
+where $\alpha$ is the global learning rate, while $\beta_1$ and $\beta_2$ control the exponential decay rates of the first and second moments, respectively, governing the trade-off between stability and responsiveness of the optimization process.
+
+In order to choose an appropriate learning rate for the Adam optimization algorithm, we performed a learning rate finder experiment. The principle consists in lauching the optimization with different $\alpha$ values, and check which one converges the quickest. 
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.01.png}
+        \subcaption*{(a)}
+        \label{fig:lr_0.01}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.1.png}
+        \subcaption*{(b)}
+        \label{fig:lr_0.1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.3\textwidth}
+        \includegraphics[width=\textwidth]{convergence stocha, N=10, lr=0.9.png}
+        \subcaption*{(c)}
+        \label{fig:lr_0.9}
+    \end{subfigure}
+    \caption{
+    (a) $\alpha = 0.01$;
+    (b) $\alpha = 0.1$ ;
+    (c) $\alpha = 0.9$
+    }
+    \label{fig:global}
+\end{figure}
+
+It is clear that the best learning rate is $\alpha = 0.9$. It reaches a plateau after about 12 iterations. 
+Based on this observation, we can arbitrarely bond the number of iterations by 12.
 \begin{thebibliography}{9}
 
 \bibitem{1}

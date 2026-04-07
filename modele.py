@@ -254,7 +254,7 @@ def modèle_stochastique(X, t, p, params, schema="advection_diffusion_terme_sour
         erreurs.append(erreur)
         return X1, np.max(erreurs)
     else:
-        return X1, masse_par_couche
+        return X1#, masse_par_couche
 
 # je construit un autre programme similaire mais qui ne fait qu'une itération en temps :
 
@@ -398,7 +398,6 @@ def X_ini_patch(N_lignes, nb_colonnes, i0=None, j0=None, size=1, value=1.0):
 
 
 def fonction_objectif(X, t, p, params):
-    
     X = modèle_stochastique(X, t, p, params, "advection_diffusion_terme_source",
                             False, None, None, None, None)
     masse_totale_algues = np.sum(X)
