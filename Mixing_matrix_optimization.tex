@@ -11,6 +11,8 @@
 \usepackage{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{mathtools}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 \geometry{margin=2.5cm}
 \title{Modeling of an Algae Pond}
 \author{Octave Litrico}
@@ -136,7 +138,7 @@ Let us denote U the set : \[\{v \in H^2([0, L])^I \ | v(0) = v(L) = Pv(L) \ \tex
 \\ The ponctual values of $\partial_xu$ are well defined. Indeed, thanks to the Morrey injection, we have that $H^2([0, L]) \hookrightarrow
 \mathcal{C}^1([0, L])$. 
 U is a Hilbert space for the following inner product :
-\[<u, v>_{U, U} = \sum_{i=1}^I\frac{1}{V_i}\int_{0}^{L}\partial_x u_i.\partial_x v_i\]
+\[\langle u, v\rangle_{U, U} = \sum_{i=1}^I\frac{1}{V_i}\int_{0}^{L}\partial_x u_i.\partial_x v_i\]
 
 The problem we are looking to solve is :
 \[\begin{cases}
@@ -149,7 +151,7 @@ Firstly, let us notice that :
 \begin{align}
     &\forall v\in U, \\
     &\langle-\Delta\rho, v\rangle_{U, U} = -\sum_{i=1}^I\frac{1}{V_i}\int_{0}^L\partial_{xx}\rho_iv \\
-    &= -\sum_{i=1}^I\frac{1}{V_i}\left[(\partial_x\rho_i(0)v_i(0) - \partial_x\rho_i(L)v_i(L)) - \int_0^L\partial_x\rho_i\partial_xv_i\right]\\
+    &= -\sum_{i=1}^I\frac{1}{V_i}\left[\left(\partial_x\rho_i(0)v_i(0) - \partial_x\rho_i(L)v_i(L)\right) - \int_0^L\partial_x\rho_i\partial_xv_i\right]\\
     &= -\sum_{i=1}^I\left(\partial_x\rho_i(0) - \partial_x\rho_i(L) - \int_0^L\partial_x\rho_i\partial_xv_i\right) \quad  \text{because} \ v_i(0) = v_i(L) = V_i  \\
     & = \sum_{i=1}^I\int_0^L\partial_x\rho_i\partial_xv_i
 \end{align}
@@ -178,14 +180,14 @@ Then, $A = \alpha V$ with $\alpha \in \mathbb{R}$\\
 With $u_i(0) = u_i(L)$ we see that :
 \[B\sin\left(\sqrt{\frac{\lambda}{\mu}}L\right) = A\left[1-\cos\left(\sqrt{\frac{\lambda}{\mu}}L\right)\right]\]
 
-If $\sqrt{\frac{\lambda}{\mu}}L \notin \pi \mathbb{Z}$ then :  \[B = \alpha V\frac{(1-\cos(\sqrt{\frac{\lambda}{\mu}}L))}{\sin(\sqrt{\frac{\lambda}{\mu}}L)}\]
+If $\sqrt{\frac{\lambda}{\mu}}L \notin \pi \mathbb{Z}$ then :  \[B = \alpha V\frac{\left(1-\cos\left(\sqrt{\frac{\lambda}{\mu}}L\right)\right)}{\sin\left(\sqrt{\frac{\lambda}{\mu}}L\right)}\]
 
 Because $\sum_i\int_0^L\rho_i = 0 $we have :
 \[ \sum_i\left[A_i\sin\left(\sqrt{\frac{\lambda}{\mu}}L\right) + B_i\left(1- \cos\left(\sqrt{\frac{\lambda}{\mu}}L\right)\right)\right] = 0\]
 
 i.e \[\alpha\left(1-\cos\left(\sqrt{\frac{\lambda}{\mu}}L\right)\right)^{2} = -\alpha\sin\left(\sqrt{\frac{\lambda}{\mu}}L\right)^{2}\]
 
-therefore, as $\alpha \neq 0$ because $u \neq 0$, we have : \[(1-\cos(\sqrt{\frac{\lambda}{\mu}}L))^{2} = - (1-\cos(\sqrt{\frac{\lambda}{\mu}}L)^{2})\]
+therefore, as $\alpha \neq 0$ because $u \neq 0$, we have : \[\left(1-\cos\left(\sqrt{\frac{\lambda}{\mu}}L\right)\right)^{2} = - \left(1-\cos\left(\sqrt{\frac{\lambda}{\mu}}L\right)^{2}\right)\]
 
 We end up with the following equation : \[\cos\left(\sqrt{\frac{\lambda}{\mu}}L\right) = 1\]
 i.e $\sqrt\frac{\lambda}{\mu}L \in 2\pi\mathbb{Z}$, contradiction.\\
@@ -200,7 +202,7 @@ $\sqrt{\frac{\lambda}{\mu}}L = n\pi$ with $n \in \mathbb{Z^*}$.
 \item If $n \in 2\mathbb{N^*}  + 1$ then we have :
 \[\sum_iB_i = 0\]
 and :
-\[A(1-\cos(\sqrt{\frac{\lambda}{\mu}}L)) = 2A = 0\] so \[\alpha = 0\]
+\[A\left(1-\cos\left(\sqrt{\frac{\lambda}{\mu}}L\right)\right) = 2A = 0\] so \[\alpha = 0\]
 
 We have eventually found all the eigen vectors of the operator $a$. These are the elements of the following sets :
 \begin{itemize}
@@ -237,7 +239,7 @@ Therefore,
 \] \\
 
 Furthermore, as for all $n \in \mathbb{N^*}, i \in \{1, \cdots, I\}$ we have :
-\[\rho_0(x) = \sum_{n \in \mathbb{N^*}}\left[ \alpha_{2n}(0)V\cos(\frac{2n\pi x}{L}) + \sum_{i=1}^{I}\beta_{2n}^{i}(0)e_i \sin(\frac{2n\pi x}{L}) + \sum_{i=1}^{I}\gamma_{2n+1}^{i}(0)e_i \sin(\frac{(2n + 1)\pi x}{L})\right]\] \\
+\[\rho_0(x) = \sum_{n \in \mathbb{N^*}}\left[ \alpha_{2n}(0)V\cos\left(\frac{2n\pi x}{L}\right) + \sum_{i=1}^{I}\beta_{2n}^{i}(0)e_i \sin\left(\frac{2n\pi x}{L}\right) + \sum_{i=1}^{I}\gamma_{2n+1}^{i}(0)e_i \sin\left(\frac{(2n + 1)\pi x}{L}\right)\right]\] \\
 
 with for all $n \in \mathbb{N}^*$:
 \[
@@ -678,7 +680,10 @@ The results are summarized below.
         \[
         B_{\text{tot}} = 50.369 \quad \mathrm{Kg}
         \]
-        This matrix induces a permutation of layers which induces the allocation of layer 1 in position 2.
+        This matrix induces a circular permutation of layers which induces the allocation of layer 1 in position 2, 
+        of layer 2 in position 3 and layer 3 in position 1. Therefore, each layer will eventually contain algea. This mixing matrix induces a higher biomass production than the simple permutation of layers 1 and 2. 
+        This can be explained by the fact that in this second case, the "mean growth coefficient" is equal to $2.2$, because only the two first layers are taken in count 
+        (the third one stays empty). In the circlar permutation case, this "mean growth coefficient" is equal to $2.4$. 
 
     \item Configuration 2 (biomass initially in layer \#2): \\
         Optimal matrix:
@@ -748,7 +753,7 @@ These observations will serve as a basis for the analysis of more general
 mixing strategies in the following sections.
 
 However, as time passes, the mixing matrix makes the basin more and more homogenous. As supposed earlier, we notice that the mixing tend to equalize the algae concentration in each layer.
-Here is a graphic representing the total algae mass in each layer as a function of time, for configuration 3 and using the mixing matrix $\mathbf{P}_3$.
+Here is a graphic representing the total algae mass in each layer as a function of time, for configuration 1 and using the mixing matrix $\mathbf{P}_1$.
 
 \begin{figure}[H]
     \centering
@@ -872,7 +877,7 @@ B(0) = \text{50 Kg}.
 
 The time horizon and flow parameters are identical to those used in the discrete optimization:
 \[
-T = \text{300 s}, \quad u = \text{0.1 m.s^{-1}}.
+T = 300 \text{s,} \quad u = 0.1\text{m.s^{-1}}.
 \]
 
 The optimization is initialized from:
@@ -885,27 +890,22 @@ The optimization is initialized from:
 
 
 The algorithm complexity is a linear function of the number of layers (cf annexes).
-Therefore, it allows us to divide the water pond into a larger number of layers. 
+Therefore, it allows us to divide the water pond into a larger number of layers, up to 20 for less than an hour of computation.
 
-For $N = \text{10}$, the optimization yields the following matrix:
+For $N = \text{5}$, the optimization yields the following matrix:
 
 \[
 P^\star =
 \begin{pmatrix}
-0.000 & 0.003 & 0.010 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.001 & 0.004 \\
-0.000 & 0.011 & 0.001 & 0.020 & 0.000 & 0.000 & 0.000 & 0.007 & 0.004 & 0.006 \\
-0.000 & 0.009 & 0.008 & 0.003 & 0.000 & 0.000 & 0.000 & 0.005 & 0.004 & 0.004 \\
-0.001 & 0.394 & 0.373 & 0.080 & 0.000 & 0.000 & 0.002 & 0.112 & 0.151 & 0.082 \\
-0.003 & 0.285 & 0.251 & 0.072 & 0.012 & 0.000 & 0.504 & 0.073 & 0.193 & 0.051 \\
-0.992 & 0.095 & 0.076 & 0.443 & 0.985 & 0.999 & 0.345 & 0.511 & 0.331 & 0.599 \\
-0.003 & 0.087 & 0.140 & 0.371 & 0.001 & 0.000 & 0.142 & 0.283 & 0.268 & 0.203 \\
-0.000 & 0.103 & 0.131 & 0.005 & 0.001 & 0.000 & 0.005 & 0.001 & 0.041 & 0.045 \\
-0.000 & 0.007 & 0.005 & 0.006 & 0.000 & 0.000 & 0.000 & 0.001 & 0.001 & 0.002 \\
-0.000 & 0.007 & 0.006 & 0.000 & 0.000 & 0.000 & 0.000 & 0.005 & 0.005 & 0.002
+8.4\times 10^{-8} & 3.0\times 10^{-5} & 3.3\times 10^{-9} & 2.6\times 10^{-7} & 1.4\times 10^{-5} \\
+2.9\times 10^{-8} & 1.7\times 10^{-5} & 1.9\times 10^{-8} & 4.0\times 10^{-8} & 2.3\times 10^{-6} \\
+0.99 & 0.45 & 1.0 & 0.95 & 0.16 \\
+5.9\times 10^{-3} & 0.55 & 1.4\times 10^{-4} & 0.046 & 0.84 \\
+2.5\times 10^{-7} & 3.9\times 10^{-5} & 1.4\times 10^{-7} & 2.1\times 10^{-8} & 1.5\times 10^{-5}
 \end{pmatrix}
 \]
 
-As seen before, the line 6 has the largest coefficients because layer 6 has the highest growth coefficient. The optimal matrix allocates most of the biomass in this layer.
+As seen before, the line 3 has the largest sum of coefficients because layer 3 has the highest growth coefficient. The optimal matrix allocates most of the biomass in this layer.
 But stochastic matrices aren't physically relevant. Indeed, in terms of water volume, a real-life paddle wheel should allocate to each layer exactly the volume of one layer. 
 Such a wheel could only be represented by a bistochastic matrix.
 
@@ -953,28 +953,23 @@ As the objective function is non-convex, the obtained solutions may depend on in
 
 \subsection{Numerical Results}
 
-After lauching the program for a $10$ layers pond, we end up with the following matrix.
+After lauching the program for a $5$ layers pond, we end up with the following matrix.
 
 \[
-\begin{bmatrix}
-0.1727 & 0.0401 & 0.1280 & 0.1118 & 0.0686 & 0.0839 & 0.0447 & 0.2331 & 0.0285 & 0.0885 \\
-0.0422 & 0.2675 & 0.0660 & 0.1765 & 0.0297 & 0.0281 & 0.1194 & 0.1010 & 0.0907 & 0.0790 \\
-0.2268 & 0.0297 & 0.1286 & 0.0654 & 0.0687 & 0.0290 & 0.2182 & 0.0791 & 0.1469 & 0.0075 \\
-0.1335 & 0.1178 & 0.0531 & 0.0894 & 0.1766 & 0.0053 & 0.0866 & 0.0164 & 0.0864 & 0.2348 \\
-0.2559 & 0.0255 & 0.3115 & 0.0160 & 0.0122 & 0.0688 & 0.0067 & 0.1059 & 0.1850 & 0.0123 \\
-0.0238 & 0.3348 & 0.0341 & 0.0567 & 0.2197 & 0.0715 & 0.0415 & 0.0387 & 0.1417 & 0.0375 \\
-0.0467 & 0.0217 & 0.0830 & 0.3417 & 0.0783 & 0.0183 & 0.2618 & 0.0856 & 0.0249 & 0.0380 \\
-0.0410 & 0.0510 & 0.0688 & 0.0451 & 0.2185 & 0.1392 & 0.0301 & 0.2752 & 0.1097 & 0.0213 \\
-0.0356 & 0.0181 & 0.0586 & 0.0700 & 0.1100 & 0.5202 & 0.0761 & 0.0173 & 0.0743 & 0.0198 \\
-0.0218 & 0.0936 & 0.0683 & 0.0274 & 0.0177 & 0.0357 & 0.1148 & 0.0476 & 0.1119 & 0.4613
-\end{bmatrix}
+\begin{pmatrix}
+0.1129 & 0.2361 & 0.4417 & 0.0438 & 0.1182 \\
+0.2028 & 0.2367 & 0.1635 & 0.1801 & 0.2150 \\
+0.4130 & 0.3952 & 0.0494 & 0.0621 & 0.1598 \\
+0.0653 & 0.0606 & 0.2453 & 0.2092 & 0.4097 \\
+0.2060 & 0.0714 & 0.1001 & 0.5047 & 0.0974
+\end{pmatrix}
 \]
 
-This mixing matrix corresponds to a final biomass (after $T = 300s$ of growth) of $B_{\text{tot}} = 50.369 \quad \mathrm{Kg}$.
+This mixing matrix corresponds to a final biomass (after $T = 300s$ of growth) of $B_{\text{tot}} = 50.367 \quad \mathrm{Kg}$.
 
 \subsection{Comparison with Permutation Matrices}
 
-The previous optimal permutation matrix algorithm allows us to compare the best permutation matrix to the bistochastic case
+The previous optimal permutation matrix algorithm allows us to compare the best permutation matrix to the bistochastic case.
 A key question is whether relaxing the admissible set from permutation matrices 
 to bistochastic matrices leads to improved performance.
 
@@ -990,18 +985,70 @@ we perform the following experiment:
 
 In all tested cases, the algorithm converges to a plateau without departing 
 significantly from the initial permutation matrix.
+Let us quantify the difference between the initial permutation matrix and the result after a gradient descent. 
+Here is a graphic showing for different values of $N$ the biomass associated with the optimal permutation matrix, and the best (and worst) bistochastic matrices
+found by a gradient descent method. The variations between the best permutation and bistochastic matrices show that the results do not differ significantly between the discrete and relaxed case.
 
-In other words, small perturbations of a permutation matrix within $\mathcal{B}_N$ 
-do not lead to an increase in the objective function.
-This suggests that, for a given permutation matrix $P^\star$, there exists a neighborhood 
-$\mathcal{U} \subset \mathcal{B}_N$ such that:
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=12cm,
+    height=7cm,
+    ylabel={Relative difference},
+    symbolic x coords={$N=3$, $N=4$, $N=5$},
+    xtick=data,
+    ymode=log,
+    log basis y={10},
+    grid=major,
+    legend style={at={(0.5,-0.2)}, anchor=north, legend columns=2}
+]
+
+% Bistoch vs Perm
+\addplot coordinates {
+    ($N=3$, 1.9159111917375704e-05)
+    ($N=4$, 6.063799064758365e-06)
+    ($N=5$, 6.102525993601309e-06)
+};
+\addlegendentry{Bistochastic vs Permutation}
+
+% Worst vs Perm
+\addplot coordinates {
+    ($N=3$, 1.9969252641183166e-02)
+    ($N=4$, 1.9966223658392133e-02)
+    ($N=5$, 1.9963790785815807e-02)
+};
+\addlegendentry{Worst vs Permutation}
+
+\end{axis}
+\end{tikzpicture}
+\caption{
+Relative differences (logarithmic scale) between mixing strategies.}
+\end{figure}
+
+The improvement obtained by bistochastic optimization remains of order $10^{-5}$, 
+while suboptimal mixing strategies induce losses of order $10^{-2}$. 
+This corresponds to a difference of three orders of magnitude. 
+
+Furthermore, the relative distance between the two matrices is rather small. The following figure shows the biomasses associated to matrices found "close" to the optimal permutation matrix.
+The relative Frobenius distance corresponds to :
 \[
-J(P) \leq J(P^\star), \quad \forall P \in \mathcal{U}.
-\]
+d(M, P) = \frac{||M-P||_{F}}{||P||_{F}} \ 
+\text{for all} M, P \in \mathcal{R}^{N}\] where $||\cdot||_{F}$ stands for the Frobenius norm.
+\begin{figure}[H]
+\includegraphics{biomasse en fonction de distance Relative à meilleure matrice de permutation.png}
+\caption{biomass production as a function of the relative (Frobenius) distance to the optimal permutation matrix}
+\label{fig:t3}
+\end{figure}
 
-In other words, permutation matrices behave as locally optimal solutions 
-within the admissible set.
+Therefore, we can conclude that, as far as the optimization
+allows to tell, the optimal bistochastic mixing matrix is a "small perturbation" of the optimal permutation matrix.
+In other words, small perturbations of a permutation matrix within $\mathcal{B}_N$ 
+do not lead to a significant increase in the objective function.
 
+
+Thus we can approximate the optimal mixing matrix to an optimal permutation matrix. 
 
 \subsection{Interpretation}
 
@@ -1014,7 +1061,7 @@ on the set of bistochastic matrices. The bistochastic optimization does not prod
 that significantly outperform the best permutation matrices.
 The results indicate that:
 \[
-J_{\text{bistochastic}} \leq J_{\text{permutation}} \quad \text{(observed numerically)}.
+J_{\text{bistochastic}} \approx J_{\text{permutation}} \quad \text{(observed numerically)}.
 \]
 \subsubsection{Extremal Nature of Optimal Strategies}
 
@@ -1026,7 +1073,7 @@ Indeed, any bistochastic matrix can be written as a convex combination of permut
 P = \sum_{k} \lambda_k P_k, \quad \lambda_k \geq 0, \quad \sum_k \lambda_k = 1.
 \]
 
-From this perspective, stochastic or bistochastic mixing can be interpreted as a probabilistic 
+From this perspective, bistochastic mixing can be interpreted as a probabilistic 
 combination of deterministic trajectories.
 
 The numerical results suggest that such averaging effects are detrimental to the objective function. 

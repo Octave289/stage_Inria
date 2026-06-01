@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage{amsmath}
+\title{Domain decomposition}
+\author{Octave Litrico}
+\date{May 2026}
+
+\begin{document}
+\begin{equation}
+\begin{cases}
+    -\Delta u_1^k = f \ \text{sur} \Omega_1 \\
+    u_1^k = g \text{sur} \partial \Omega_1 \setminus \{\beta\}\times(0,1)\\
+    u_1^k(\beta, y) = u_2^{k-1}(\beta, y)
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\begin{cases}
+    -\Delta u_2^k = f \ \text{sur} \Omega_2\\
+    u_2^k = g \text{sur} \partial \Omega_2 \setminus \{\alpha\}\times(0,1)\\
+    u_2^k(\alpha, y) = u_1^{k}(\alpha, y)
+\end{cases}
+\end{equation}
+
+
+On pose \[e_i^k = u - u_i^k\], et on obtient :
+
+\begin{equation}
+    \begin{cases}
+    -\Delta e_1^k = 0 \ \text{sur} \Omega\\
+    e_1^k = 0 \text{sur} \partial \Omega_1 \setminus \{\beta\}\times(0,1)\\
+    e_1^k(\beta, y) = e_2^{k-1}(\beta, y)
+\end{cases}
+\label{eq:def1}
+\end{equation}
+
+
+et
+\begin{cases}
+    -\Delta e_2^k = 0 \ \text{sur} \Omega\\
+    e_2^k = 0 \text{sur} \partial \Omega_2 \setminus {\alpha}*(0, 1)\\
+    e_2^k(\beta, y) = e_1^{k}(\beta, y)
+\end{cases}
+
+On pose pour tout $n \in \mathrm{N}$ :
+\[z_n(y) = \sqrt{2}\sin(n\pi y)\]
+
+la famille $\left(z_n)_{n \in \mathrm{N}}\right)$ forme une base hilbertienne de $H^1((0, 1))$. 
+Nous pouvons donc décomposer $e_i^k$ en séries de Fourier comme suit :
+\[ e_i^k(x) = \sum_{n=1}^{\infty}e_{i, n}^k(x)z_n(y)\] 
+donc en appliquant \eqref{eq:def1}
+
+\[\sum_{n=1}^{\infty}\left(\partial_{xx}e_1^k(x) - n^2\pi^2e_{1, n}^kz_n(y)\right) = 0\]
+
+donc \[\partial_{xx}e_1^k(x) - n^2\pi^2e_{1, n}^k = 0\] par identification
+donc \[e_{1, n}^k = A_n\exp(n\pi x) + B_n\exp(-n\pi x)\]
+or $e_1(x, 0) = e_1(x, 1) = 0$
+donc  \[\sum_{n=1}^{\infty}(A_n + B_n)\sin(n\pi y) = 0\]
+donc par identification, $A_n = -B_n$
+en $ x = \beta$ on a donc :
+\[\sum_{n=1}^{\infty}A_n(\exp(n\pi \beta) - \exp(-n\pi \beta)\sin(n\pi y)) = e_2^{k-1}(\beta, y)\]
+donc $A_n(\exp(n\pi \beta) - \exp(-n\pi \beta)) = e_{2, n}^{k-1}(\beta)$
+donc $A_n = \frac{e_{2, n}^{k-1}(\beta)}{\exp(n\pi \beta) - \exp(-n\pi \beta)}$
+
+De plus, en appliquant le même raisonnement à $e_2^k$, on obtient :
+\[e_{2, n}^k = C_n\exp(n\pi x) + D_n\exp(-n\pi x)\] or $e_2^k(b, y) = 0 \forall y \in (0, 1)$
+donc $D_n = -C_n\exp(2n\pi b)$
+
+et $e_2^k(\alpha, y) = e_1^k(\alpha, y)$ donc $\sum_{n=1}^{\infty}C_n(\exp(n\pi\alpha) - \exp(n\pi(2b - \alpha)))\sin(n\pi y) 
+= \sum_{n=1}^{\infty}A_n(\exp(n\pi\alpha) - \exp(-n\pi\alpha))\sin(n\pi\alpha)$ 
+donc \[C_n = \frac{e_{2, n}^{k-1}(\beta)}{\exp(n\pi \beta) - \exp(-n\pi \beta)}\frac{\exp(n\pi \alpha) - \exp(-n\pi \alpha)}{\exp(n\pi\alpha) - \exp(n\pi(2b - \alpha))}\]
+donc \[e_2^k(\beta, y) = \sum_{n=1}^{\infty}e_{2, n}^{k-1}(\beta)\frac{\exp(n\pi \alpha) - \exp(-n\pi \alpha)}{\exp(n\pi \beta) - \exp(-n\pi \beta)}\frac{\exp(n\pi\beta) - \exp(n\pi(2b - \beta))}{\exp(n\pi\alpha) - \exp(n\pi(2b - \alpha))}\]
+
+\end{document}

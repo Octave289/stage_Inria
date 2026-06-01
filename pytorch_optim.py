@@ -316,12 +316,37 @@ def solve_optimize(X_init, t, params, p0):
         constraints.append({'type': 'eq', 'fun' : lambda x, i=i: np.sum(x[N*i:N*(i+1)]) - 1})
         for j in range(N):
             constraints.append({'type': 'ineq', 'fun' : lambda x, i=i, j=j: x[N*i + j]})
-    for j in range(N-1):
+    for j in range(N):
         constraints.append({'type': 'eq', 'fun' : lambda x, j=j: np.sum(x[N*i + j] for i in range(N)) - 1})
     
 
     return minimize(fonction_objectif_optimize, p0, constraints=constraints)
+
+def solve_optimize_stochastic(X_init, t, params, p0): 
+
+    def fonction_objectif_optimize(p_list):
+        N = params["N"]
+        p = vector_to_matrix(p_list, N)
+
+        X = modele.modèle_stochastique(X_init, t, p, params, "advection_diffusion_terme_source",
+                                False, None, None, None, None)
+        masse_totale_algues = np.sum(X)
+        print(masse_totale_algues)
+        return -masse_totale_algues
     
+    constraints = []
+    N = params["N"]
+    for i in range(N):
+        for j in range(N):
+            constraints.append({'type': 'ineq', 'fun' : lambda x, i=i, j=j: x[N*i + j]})
+            constraints.append({'type': 'ineq', 'fun' : lambda x, i=i, j=j: 1 - x[N*i + j]})
+    for j in range(N):
+        constraints.append({'type': 'eq', 'fun' : lambda x, j=j: np.sum(x[N*i + j] for i in range(N)) - 1})
+    
+
+    return minimize(fonction_objectif_optimize, p0, constraints=constraints)
+
+
 def solve_fast(
     X_init, t, N_lignes, nb_colonnes, L, H, mu, u, CFL,
     n_iter=150,

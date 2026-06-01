@@ -1,0 +1,152 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+
+\title{Domain decomposition}
+\author{Octave Litrico}
+\date{May 2026}
+
+\begin{document}
+
+\maketitle
+
+% ===================== PROBLÈME 1 =====================
+
+\begin{equation}
+\begin{cases}
+-\Delta u_1^k = f & \text{sur } \Omega_1 \\[4pt]
+u_1^k = g & \text{sur } \partial \Omega_1 \setminus (\{\beta\}\times(0,1)) \\[4pt]
+u_1^k(\beta,y) = u_2^{k-1}(\beta,y)
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\begin{cases}
+-\Delta u_2^k = f & \text{sur } \Omega_2 \\[4pt]
+u_2^k = g & \text{sur } \partial \Omega_2 \setminus (\{\alpha\}\times(0,1)) \\[4pt]
+u_2^k(\alpha,y) = u_1^k(\alpha,y)
+\end{cases}
+\end{equation}
+
+% ===================== ERREUR =====================
+
+On pose
+\[
+e_i^k = u - u_i^k
+\]
+
+\begin{equation}
+\begin{cases}
+-\Delta e_1^k = 0 & \text{sur } \Omega_1 \\[4pt]
+e_1^k = 0 & \text{sur } \partial \Omega_1 \setminus (\{\beta\}\times(0,1)) \\[4pt]
+e_1^k(\beta,y) = e_2^{k-1}(\beta,y)
+\end{cases}
+\label{eq:def1}
+\end{equation}
+
+\begin{equation}
+\begin{cases}
+-\Delta e_2^k = 0 & \text{sur } \Omega_2 \\[4pt]
+e_2^k = 0 & \text{sur } \partial \Omega_2 \setminus (\{\alpha\}\times(0,1)) \\[4pt]
+e_2^k(\alpha,y) = e_1^k(\alpha,y)
+\end{cases}
+\end{equation}
+
+% ===================== BASE =====================
+
+On pose pour tout $n \in \mathbb{N}$ :
+\[
+z_n(y) = \sqrt{2}\sin(n\pi y)
+\]
+
+La famille $(z_n)_{n\in\mathbb{N}}$ forme une base hilbertienne de $L^2(0,1)$.
+
+% ===================== DÉCOMPOSITION =====================
+
+\[
+e_i^k(x,y) = \sum_{n=1}^{\infty} e_{i,n}^k(x)\, z_n(y)
+\]
+
+
+
+En appliquant \eqref{eq:def1}, on obtient :
+\begin{align*}
+\sum_{n=1}^{\infty}\Big(\partial_{xx}e_1^k(x) - n^2\pi^2 e_{1,n}^k z_n(y)\Big) &= 0
+\end{align*}
+
+Donc
+\[
+\partial_{xx} e_{1,n}^k - n^2\pi^2 e_{1,n}^k = 0
+\]
+
+Donc
+\[
+e_{1,n}^k(x) = A_n e^{n\pi x} + B_n e^{-n\pi x}
+\]
+
+\begin{align*}
+\text{or } \quad & e_1(0, y) = 0 \\[6pt]
+\text{donc} \quad & \sum_{n=1}^{\infty}(A_n + B_n)\sin(n\pi y) = 0 \\[6pt]
+\text{donc} \quad & A_n = -B_n \\[6pt]
+\text{en } x=\beta : \quad &
+\sum_{n=1}^{\infty} A_n\big(e^{n\pi\beta} - e^{-n\pi\beta}\big)\sin(n\pi y)
+= e_2^{k-1}(\beta,y)
+\end{align*}
+
+Donc
+\[
+A_n\big(e^{n\pi\beta} - e^{-n\pi\beta}\big)
+= e_{2,n}^{k-1}(\beta)
+\]
+
+Donc
+\[
+A_n =
+\frac{e_{2,n}^{k-1}(\beta)}
+{e^{n\pi\beta} - e^{-n\pi\beta}}
+\]
+
+\vspace{6pt}
+
+De plus, en appliquant le même raisonnement à $e_2^k$, on obtient :
+\[
+e_{2,n}^k = C_n e^{n\pi x} + D_n e^{-n\pi x}
+\]
+
+or
+\[
+e_2^k(b,y)=0 \quad \forall y\in(0,1)
+\quad \text{donc} \quad
+D_n = -C_n e^{2n\pi b}
+\]
+
+\vspace{6pt}
+
+et $e_2^k(\alpha,y)=e_1^k(\alpha,y)$ donc
+\begin{align*}
+&\sum_{n=1}^{\infty} C_n\big(e^{n\pi\alpha} - e^{n\pi(2b-\alpha)}\big)\sin(n\pi y) \\
+&= \sum_{n=1}^{\infty} A_n\big(e^{n\pi\alpha} - e^{-n\pi\alpha}\big)\sin(n\pi y)
+\end{align*}
+
+Donc
+\[
+C_n =
+\frac{e_{2,n}^{k-1}(\beta)}
+{e^{n\pi\beta} - e^{-n\pi\beta}}
+\cdot
+\frac{e^{n\pi\alpha} - e^{-n\pi\alpha}}
+{e^{n\pi\alpha} - e^{n\pi(2b-\alpha)}}
+\]
+
+Enfin
+\[
+e_2^k(\beta,y)
+=
+\sum_{n=1}^{\infty}
+e_{2,n}^{k-1}(\beta)
+\frac{e^{n\pi\alpha} - e^{-n\pi\alpha}}
+{e^{n\pi\beta} - e^{-n\pi\beta}}
+\frac{e^{n\pi\beta} - e^{n\pi(2b-\beta)}}
+{e^{n\pi\alpha} - e^{n\pi(2b-\alpha)}}
+\]
+\end{document}

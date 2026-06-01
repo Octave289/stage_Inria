@@ -437,6 +437,7 @@ def meilleure_matrice_de_permutation(X, t, params,
     meilleure_masse = 0
     meilleure_matrice = np.identity(N_lignes)
     liste_biomasses = []
+    liste_matrices = []
     def generer_matrice(n, X, t, params,
                        liste=None):#algorithme de Heap
         nonlocal meilleure_masse, meilleure_matrice
@@ -444,6 +445,7 @@ def meilleure_matrice_de_permutation(X, t, params,
             liste = list(range(N_lignes))
         if n==1:
             masse_totale_algues, p = test(liste, X, t, params)
+            #liste_matrices.append(p)#
             liste_biomasses.append(masse_totale_algues)
             if masse_totale_algues > meilleure_masse:
                 meilleure_masse = masse_totale_algues
